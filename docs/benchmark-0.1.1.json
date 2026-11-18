@@ -1,0 +1,58 @@
+[
+  {
+    "version": "0.1.0",
+    "startup_ms": [
+      903,
+      1315,
+      948
+    ],
+    "startup_median_ms": 948,
+    "screen_on": {
+      "pss_kib": 28869.0,
+      "samples_kib": [
+        27148,
+        30590
+      ],
+      "cpu_one_core_pct": 2.13,
+      "playing_after": true
+    },
+    "screen_off": {
+      "pss_kib": 26450.0,
+      "samples_kib": [
+        26378,
+        26522
+      ],
+      "cpu_one_core_pct": 0.28,
+      "playing_after": true,
+      "screen_asleep": true
+    }
+  },
+  {
+    "version": "0.1.1",
+    "startup_ms": [
+      964,
+      970,
+      1019
+    ],
+    "startup_median_ms": 970,
+    "screen_on": {
+      "pss_kib": 25453.5,
+      "samples_kib": [
+        24308,
+        26599
+      ],
+      "cpu_one_core_pct": 0.14,
+      "playing_after": true
+    },
+    "screen_off": {
+      "pss_kib": 25779.5,
+      "samples_kib": [
+        25988,
+        25571
+      ],
+      "cpu_one_core_pct": 0.28,
+      "playing_after": true,
+      "screen_asleep": true
+    }
+  }
+]

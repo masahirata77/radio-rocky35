@@ -30,3 +30,7 @@ Revisión manual: 10 entradas agrupadas en 9 grupos de duplicados, con URLs alte
 
 ## Android 0.2.4
 Reproducción en segundo plano mediante MediaPlayer, MediaSession y servicio en primer plano de tipo mediaPlayback, con notificación multimedia y wake lock durante la reproducción. La versión web conserva HTMLAudio. No se incorporó ahorro de datos ni cambio de bitrate. APK optimizado: ./gradlew :app:assembleOptimized. La prueba de reproducción con pantalla bloqueada queda pendiente en el dispositivo.
+
+## 0.1.1 — optimización
+Catálogo e índice normalizado generados en compilación de Rust, sin JSON en runtime ni copia de assets; JNI con índices enteros y campos bajo demanda. Filas recicladas, lista liberada al ocultar UI y reconstruida al volver; observadores de estado multimedia y volumen en vez de sondeo periódico, búsqueda con 100 ms de debounce. Favoritos conservan formato de almacenamiento 0.1.0. Perfil Rust opt-level=z, LTO y panic=abort.
+Comparación preliminar documentada en docs/benchmark-0.1.1.md.

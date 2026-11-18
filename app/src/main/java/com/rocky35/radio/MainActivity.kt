@@ -3,6 +3,10 @@ package com.rocky35.radio
 import android.app.Activity
 import android.os.*
 import android.content.Context
+import android.database.ContentObserver
+import android.provider.Settings
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
@@ -43,15 +47,24 @@ class MainActivity : Activity() {
     private var onlyFavorites = false
     private var selected = ""
     private var phase = "idle"
-    private var currentName = ""
-    private var rows = JSONArray()
-    private var allStations = JSONArray()
+    private var rows = IntArray(0)
+    private var detached = false
+    private var firstRow = 0
+    private var firstOffset = 0
     private var changing = false
     private var draggingVolume = false
     private val prefs by lazy { getSharedPreferences("radio", MODE_PRIVATE) }
-    private val poll = object : Runnable {
-        override fun run() { sync(); handler.postDelayed(this, 500) }
+    private val playbackObserver: (RadioService.Companion.Snapshot)->Unit = { syncPlayback(it) }
+    private val volumeObserver = object:ContentObserver(handler){
+        override fun onChange(selfChange:Boolean){syncVolume()}
     }
+    private val audioDevices = object:AudioDeviceCallback(){
+        override fun onAudioDevicesAdded(devices:Array<out AudioDeviceInfo>){syncVolume()}
+        override fun onAudioDevicesRemoved(devices:Array<out AudioDeviceInfo>){syncVolume()}
+    }
+    private val volumeSync = Runnable {syncVolume()}
+    private val searchRefresh = Runnable {refresh()}
+    private fun scheduleSearch(){handler.removeCallbacks(searchRefresh);handler.postDelayed(searchRefresh,100)}
     private fun dp(n: Int) = (n * resources.displayMetrics.density + .5f).toInt()
     private fun shape(c: Int, radius:Int=12, border:Int=0) = GradientDrawable().apply { setColor(c);cornerRadius=dp(radius).toFloat();if(border!=0)setStroke(dp(1),border) }
     private fun label(t:String,size:Float=15f,c:Int=fg,bold:Boolean=false) = TextView(this).apply {
@@ -70,10 +83,7 @@ class MainActivity : Activity() {
         audio=getSystemService(Context.AUDIO_SERVICE) as AudioManager
         volumeControlStream=AudioManager.STREAM_MUSIC
         try { val a=JSONArray(prefs.getString("favorites","[]")?: "[]");for(i in 0 until a.length())favorites.add(a.getString(i)) }catch(_:Exception){}
-        allStations=JSONArray(RustCore.filter("","",false,"[]"))
-        val ds=JSONArray(RustCore.departments())
-        departments.clear();departments.add("");for(i in 0 until ds.length())departments.add(ds.getString(i))
-        if((0 until allStations.length()).any{allStations.getJSONObject(it).isNull("department")})departments.add("unknown")
+        departments.clear();departments.addAll(RustCore.departments())
         val root=col().apply {setBackgroundColor(bg);setPadding(dp(12),dp(14),dp(12),dp(10))}
         if(Build.VERSION.SDK_INT>=30)window.setDecorFitsSystemWindows(false)
         root.setOnApplyWindowInsetsListener { v,ins ->
@@ -95,7 +105,7 @@ class MainActivity : Activity() {
         root.addFull(region,46,8)
         val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,9)
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
-        adapter=StationAdapter();list=ListView(this).apply {divider=null;dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT}
+        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
@@ -105,24 +115,24 @@ class MainActivity : Activity() {
         val volRow=row();volRow.addView(label("Volumen",13f,muted));volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
         volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent);player.addFull(volRow,40);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
-        search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)refresh()};override fun afterTextChanged(s:Editable?) {}})
+        search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
         allTab.setOnClickListener{mode(false)};favTab.setOnClickListener{mode(true)}
-        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.length()>0)listen(rows.getJSONObject(0).getString("id"))}
+        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(RustCore.row(rows[0])[0])}
         favorite.setOnClickListener{if(selected.isNotEmpty())flip(selected)}
         volume.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(bar:SeekBar?,p:Int,fromUser:Boolean){if(fromUser)audio.setStreamVolume(AudioManager.STREAM_MUSIC,p,0);percent.text="${p*100/volume.max.coerceAtLeast(1)}%"}
             override fun onStartTrackingTouch(bar:SeekBar?){draggingVolume=true}
-            override fun onStopTrackingTouch(bar:SeekBar?){draggingVolume=false}
+            override fun onStopTrackingTouch(bar:SeekBar?){draggingVolume=false;syncVolume()}
         })
-        refresh();sync()
+        refresh();syncPlayback(RadioService.snapshot());syncVolume()
     }
-    private fun mode(f:Boolean){onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();list.setSelection(0)}
+    private fun mode(f:Boolean){handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();list.setSelection(0)}
     private fun refresh(){
-        if(!::adapter.isInitialized)return
-        rows=JSONArray(RustCore.filter(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,JSONArray(favorites.toList()).toString()))
+        if(!::adapter.isInitialized||detached)return
+        rows=RustCore.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
-        count.text="${rows.length()} radios"
+        count.text="${rows.size} radios"
         allTab.background=shape(if(!onlyFavorites)Color.rgb(48,72,107) else panel)
         favTab.background=shape(if(onlyFavorites)Color.rgb(48,72,107) else panel)
         adapter.notifyDataSetChanged();updatePlayer()
@@ -131,7 +141,7 @@ class MainActivity : Activity() {
     private fun playing()=phase=="playing"||phase=="loading"
     private fun listen(id:String){
         if(id==selected && playing()){startService(RadioService.pauseIntent(this));phase="paused"}
-        else {selected=id;phase="loading";startForegroundService(RadioService.playIntent(this,id))}
+        else {selected=id;phase="loading";val station=RustCore.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
         updatePlayer();adapter.notifyDataSetChanged()
     }
     private fun updatePlayer(){
@@ -141,32 +151,85 @@ class MainActivity : Activity() {
         favorite.setTextColor(if(favorites.contains(selected))yellow else muted)
         favorite.isEnabled=selected.isNotEmpty()
     }
-    private fun sync(){
-        val snap=JSONObject(RadioService.snapshot())
-        val id=snap.optString("id");val p=snap.optString("phase")
-        if(id.isNotEmpty()){
-            val change=id!=selected||phase!=p;selected=id;phase=p
-            currentName=(0 until allStations.length()).map{allStations.getJSONObject(it)}.firstOrNull{it.optString("id")==id}?.optString("name") ?: ""
-            now.text=currentName;status.text=snap.optString("message")
-            if(change){adapter.notifyDataSetChanged();updatePlayer()}
-        }
-        if(!draggingVolume){volume.max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);volume.progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);percent.text="${volume.progress*100/volume.max.coerceAtLeast(1)}%"}
+    private fun syncPlayback(snap:RadioService.Companion.Snapshot){
+        if(snap.id.isEmpty())return
+        val change=snap.id!=selected||phase!=snap.phase
+        selected=snap.id;phase=snap.phase
+        if(now.text!=snap.name)now.text=snap.name
+        if(status.text!=snap.message)status.text=snap.message
+        if(change){adapter.notifyDataSetChanged();updatePlayer()}
     }
-    override fun onResume(){super.onResume();handler.removeCallbacks(poll);handler.post(poll)}
-    override fun onPause(){handler.removeCallbacks(poll);super.onPause()}
+    private fun syncVolume(){
+        if(!::volume.isInitialized||draggingVolume)return
+        val max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val level=audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+        if(volume.max!=max)volume.max=max
+        if(volume.progress!=level)volume.progress=level
+        val text="${level*100/max.coerceAtLeast(1)}%"
+        if(percent.text!=text)percent.text=text
+    }
+    override fun dispatchKeyEvent(event:KeyEvent):Boolean{
+        val result=super.dispatchKeyEvent(event)
+        if(event.keyCode==KeyEvent.KEYCODE_VOLUME_UP||event.keyCode==KeyEvent.KEYCODE_VOLUME_DOWN||event.keyCode==KeyEvent.KEYCODE_VOLUME_MUTE){
+            handler.removeCallbacks(volumeSync);handler.postDelayed(volumeSync,120)
+        }
+        return result
+    }
+    override fun onStart(){
+        super.onStart()
+        if(detached){
+            detached=false;refresh()
+            list.adapter=adapter
+            list.setSelectionFromTop(firstRow,firstOffset)
+        }
+        RadioService.observe(playbackObserver)
+        contentResolver.registerContentObserver(Settings.System.CONTENT_URI,true,volumeObserver)
+        audio.registerAudioDeviceCallback(audioDevices,handler)
+        syncVolume()
+    }
+    override fun onStop(){
+        RadioService.removeObserver(playbackObserver)
+        contentResolver.unregisterContentObserver(volumeObserver)
+        audio.unregisterAudioDeviceCallback(audioDevices)
+        handler.removeCallbacks(volumeSync);handler.removeCallbacks(searchRefresh)
+        firstRow=list.firstVisiblePosition
+        firstOffset=list.getChildAt(0)?.top?:0
+        list.adapter=null
+        rows=IntArray(0);detached=true
+        super.onStop()
+    }
+    private inner class StationRow:LinearLayout(this@MainActivity){
+        var id=""
+        private val border=shape(panel,15,line)
+        private val icon=button("▶",blue)
+        private val labels=col()
+        private val name=label("",15f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END}
+        private val department=label("",12f,muted)
+        private val star=button("☆",muted).apply{textSize=25f}
+        init{
+            orientation=HORIZONTAL;gravity=Gravity.CENTER_VERTICAL;background=border;setPadding(dp(8),dp(5),dp(5),dp(5))
+            addView(icon,LayoutParams(dp(44),dp(46)).apply{marginEnd=dp(9)})
+            labels.addFull(name);labels.addFull(department);addView(labels,LayoutParams(0,dp(52),1f))
+            addView(star,LayoutParams(dp(45),dp(46)))
+            icon.setOnClickListener{listen(id)};labels.setOnClickListener{listen(id)};star.setOnClickListener{flip(id)}
+        }
+        fun bind(index:Int){
+            val s=RustCore.row(index);if(s.size!=3)return
+            id=s[0];name.text=s[1];department.text=s[2].ifEmpty{"Departamento sin confirmar"}
+            border.setStroke(dp(1),if(id==selected)blue else line)
+            icon.text=if(id==selected&&playing())"Ⅱ" else "▶"
+            icon.contentDescription=(if(id==selected&&playing())"Pausar " else "Escuchar ")+s[1]
+            val f=favorites.contains(id);star.text=if(f)"★" else "☆";star.setTextColor(if(f)yellow else muted)
+            star.contentDescription=(if(f)"Quitar de favoritas: " else "Agregar a favoritas: ")+s[1]
+        }
+    }
     private inner class StationAdapter:BaseAdapter(){
-        override fun getCount()=rows.length()
-        override fun getItem(position:Int)=rows.getJSONObject(position)
-        override fun getItemId(position:Int)=position.toLong()
+        override fun getCount()=rows.size
+        override fun getItem(position:Int)=rows[position]
+        override fun getItemId(position:Int)=rows[position].toLong()
+        override fun hasStableIds()=true
         override fun getView(position:Int,convertView:View?,parent:ViewGroup?):View{
-            val s=getItem(position);val id=s.getString("id")
-            val item=row().apply{background=shape(panel,15,if(id==selected)blue else line);setPadding(dp(8),dp(5),dp(5),dp(5))}
-            val icon=button(if(id==selected&&playing())"Ⅱ" else "▶",blue)
-            item.addView(icon,LinearLayout.LayoutParams(dp(44),dp(46)).apply{marginEnd=dp(9)})
-            val labels=col();labels.addFull(label(s.getString("name"),15f,fg,true));labels.addFull(label(if(s.isNull("department"))"Departamento sin confirmar" else s.getString("department"),12f,muted))
-            item.addView(labels,LinearLayout.LayoutParams(0,dp(52),1f));icon.setOnClickListener{listen(id)};labels.setOnClickListener{listen(id)}
-            val star=button(if(favorites.contains(id))"★" else "☆",if(favorites.contains(id))yellow else muted).apply{textSize=25f;contentDescription=if(favorites.contains(id))"Quitar de favoritas" else "Agregar a favoritas"}
-            star.setOnClickListener{flip(id)};item.addView(star,LinearLayout.LayoutParams(dp(45),dp(46)));return item
+            return (convertView as? StationRow ?: StationRow()).apply{bind(getItem(position))}
         }
     }
 }

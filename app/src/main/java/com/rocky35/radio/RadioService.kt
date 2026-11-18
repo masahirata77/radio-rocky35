@@ -6,8 +6,6 @@ import android.media.*
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
 import android.os.*
-import org.json.*
-import java.util.LinkedHashSet
 
 class RadioService : Service() {
     companion object {
@@ -15,8 +13,17 @@ class RadioService : Service() {
         private const val PAUSE = "com.rocky35.radio.PAUSE"
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
-        @Volatile private var state = """{"id":"","phase":"idle","message":"Lista para escuchar"}"""
-        @JvmStatic fun snapshot(): String = state
+        data class Snapshot(val id:String, val name:String, val phase:String, val message:String)
+        private var state = Snapshot("","","idle","Lista para escuchar")
+        private val listeners = linkedSetOf<(Snapshot)->Unit>()
+        fun snapshot():Snapshot = state
+        fun observe(listener:(Snapshot)->Unit) { listeners.add(listener);listener(state) }
+        fun removeObserver(listener:(Snapshot)->Unit) { listeners.remove(listener) }
+        private fun emit(snapshot:Snapshot) {
+            if(state==snapshot)return
+            state=snapshot
+            listeners.toList().forEach{it(snapshot)}
+        }
         @JvmStatic fun playIntent(c:Context,id:String)=Intent(c,RadioService::class.java).setAction(PLAY).putExtra("id",id)
         @JvmStatic fun pauseIntent(c:Context)=Intent(c,RadioService::class.java).setAction(PAUSE)
     }
@@ -64,16 +71,11 @@ class RadioService : Service() {
         return START_NOT_STICKY
     }
     private fun loadStation(stationId:String):Boolean{
-        return try{
-            val arr=JSONArray(assets.open("stations.json").bufferedReader().use{it.readText()})
-            val s=(0 until arr.length()).map{arr.getJSONObject(it)}.firstOrNull{it.optString("id")==stationId}?:return false
-            id=stationId;name=s.optString("name")
-            val unique=LinkedHashSet<String>()
-            s.optJSONArray("streams")?.let{a->for(i in 0 until a.length())unique.add(a.optString(i))}
-            unique.add(s.optString("url"));unique.add(s.optString("original"))
-            urls=unique.filter{it.startsWith("http://")||it.startsWith("https://")}
-            urls.isNotEmpty()
-        }catch(e:Exception){android.util.Log.w("RadioRocky35","Catálogo",e);false}
+        val station=RustCore.station(stationId)
+        if(station.size<2)return false
+        id=stationId;name=station[0]
+        urls=station.asList().subList(1,station.size)
+        return true
     }
     private fun begin(stationId:String?){
         releasePlayer();resumeAfterFocus=false
@@ -130,7 +132,7 @@ class RadioService : Service() {
         stopSelf()
     }
     private fun publish(p:String,text:String){
-        phase=p;message=text;state=JSONObject().put("id",id).put("phase",p).put("message",text).toString()
+        phase=p;message=text;emit(Snapshot(id,name,p,text))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f).build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
