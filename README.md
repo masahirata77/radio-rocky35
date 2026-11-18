@@ -1,3 +1,19 @@
+# Radio Rocky 35 — rust-native
+
+Rama experimental, derivada del snapshot estable 0.2.4 (4a322fc).
+- Arquitectura: Kotlin + Android Views + Rust (JNI). No WebView en el APK.
+- Identificador independiente: `com.rocky35.radio.rustnative`.
+- Catálogo de 113 emisoras idéntico al estable; filtros y búsqueda implementados en Rust.
+- Favoritos mediante SharedPreferences (cada variante guarda su propio conjunto).
+- MediaPlayer, servicio de reproducción, MediaSession y volumen del sistema en Kotlin.
+- Compilación ARM64 (Samsung A15), Android NDK 27.2.12479018, Rust aarch64-linux-android.
+- Compilar: `./build-android.sh` (Gradle offline tras descargar sus dependencias).
+- APK: `app/build/outputs/apk/optimized/app-optimized.apk`.
+- Compilación y firma verificadas. Pruebas de uso real, pantalla apagada y rendimiento pendientes.
+- No reemplaza ni modifica la versión estable.
+
+## Historial de la versión estable (referencia)
+
 # Radio Rocky 35
 Reproductor local de radios uruguayas. Ejecutar `python3 -m http.server 8765 --bind 127.0.0.1` desde esta carpeta y abrir http://localhost:8765.
 Catálogo: Radio Browser (https://api.radio-browser.info/), filtrado por UY y última comprobación positiva; no garantiza reproducción actual. Se excluyen HLS y URLs repetidas. El audio se recibe directamente de cada radio. Favoritos guardados en el navegador.

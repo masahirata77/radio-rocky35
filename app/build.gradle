@@ -3,11 +3,11 @@ android {
     namespace 'com.rocky35.radio'
     compileSdk 37
     defaultConfig {
-        applicationId 'com.rocky35.radio'
+        applicationId 'com.rocky35.radio.rustnative'
         minSdk 26
         targetSdk 37
-        versionCode 6
-        versionName '0.2.4'
+        versionCode 1
+        versionName '0.1.0'
     }
     buildTypes {
         optimized {
@@ -22,7 +22,7 @@ android {
     sourceSets { main { assets.srcDir file("build/generated/web-assets") } }
 }
 tasks.register('syncWeb', Sync) {
-    from(rootProject.projectDir) { include 'index.html', 'app.js', 'stations.json' }
+    from(rootProject.projectDir) { include 'stations.json' }
     into layout.buildDirectory.dir("generated/web-assets")
 }
 tasks.named('preBuild').configure { dependsOn 'syncWeb' }
