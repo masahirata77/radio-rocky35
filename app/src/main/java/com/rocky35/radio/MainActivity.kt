@@ -83,7 +83,7 @@ class MainActivity : Activity() {
         audio=getSystemService(Context.AUDIO_SERVICE) as AudioManager
         volumeControlStream=AudioManager.STREAM_MUSIC
         try { val a=JSONArray(prefs.getString("favorites","[]")?: "[]");for(i in 0 until a.length())favorites.add(a.getString(i)) }catch(_:Exception){}
-        departments.clear();departments.addAll(RustCore.departments())
+        departments.clear();departments.addAll(Catalog.departments())
         val root=col().apply {setBackgroundColor(bg);setPadding(dp(12),dp(14),dp(12),dp(10))}
         if(Build.VERSION.SDK_INT>=30)window.setDecorFitsSystemWindows(false)
         root.setOnApplyWindowInsetsListener { v,ins ->
@@ -118,7 +118,7 @@ class MainActivity : Activity() {
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
         allTab.setOnClickListener{mode(false)};favTab.setOnClickListener{mode(true)}
-        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(RustCore.row(rows[0])[0])}
+        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(Catalog.row(rows[0])[0])}
         favorite.setOnClickListener{if(selected.isNotEmpty())flip(selected)}
         volume.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(bar:SeekBar?,p:Int,fromUser:Boolean){if(fromUser)audio.setStreamVolume(AudioManager.STREAM_MUSIC,p,0);percent.text="${p*100/volume.max.coerceAtLeast(1)}%"}
@@ -130,7 +130,7 @@ class MainActivity : Activity() {
     private fun mode(f:Boolean){handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();list.setSelection(0)}
     private fun refresh(){
         if(!::adapter.isInitialized||detached)return
-        rows=RustCore.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
+        rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
         count.text="${rows.size} radios"
         allTab.background=shape(if(!onlyFavorites)Color.rgb(48,72,107) else panel)
@@ -141,7 +141,7 @@ class MainActivity : Activity() {
     private fun playing()=phase=="playing"||phase=="loading"
     private fun listen(id:String){
         if(id==selected && playing()){startService(RadioService.pauseIntent(this));phase="paused"}
-        else {selected=id;phase="loading";val station=RustCore.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
+        else {selected=id;phase="loading";val station=Catalog.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
         updatePlayer();adapter.notifyDataSetChanged()
     }
     private fun updatePlayer(){
@@ -214,7 +214,7 @@ class MainActivity : Activity() {
             icon.setOnClickListener{listen(id)};labels.setOnClickListener{listen(id)};star.setOnClickListener{flip(id)}
         }
         fun bind(index:Int){
-            val s=RustCore.row(index);if(s.size!=3)return
+            val s=Catalog.row(index);if(s.size!=3)return
             id=s[0];name.text=s[1];department.text=s[2].ifEmpty{"Departamento sin confirmar"}
             border.setStroke(dp(1),if(id==selected)blue else line)
             icon.text=if(id==selected&&playing())"Ⅱ" else "▶"

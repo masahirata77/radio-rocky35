@@ -3,7 +3,7 @@ android {
     namespace 'com.rocky35.radio'
     compileSdk 37
     defaultConfig {
-        applicationId 'com.rocky35.radio.rustnative'
+        applicationId 'com.rocky35.radio.kotlinpuro'
         minSdk 26
         targetSdk 37
         versionCode 2

@@ -1,4 +1,1 @@
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
--keep class com.rocky35.radio.RustCore { *; }
+# Sin reglas: Kotlin puro

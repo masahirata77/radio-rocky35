@@ -71,7 +71,7 @@ class RadioService : Service() {
         return START_NOT_STICKY
     }
     private fun loadStation(stationId:String):Boolean{
-        val station=RustCore.station(stationId)
+        val station=Catalog.station(stationId)
         if(station.size<2)return false
         id=stationId;name=station[0]
         urls=station.asList().subList(1,station.size)
