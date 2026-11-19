@@ -15,12 +15,17 @@ class RadioService : Service() {
         private const val PAUSE = "com.rocky35.radio.PAUSE"
         private const val STOP = "com.rocky35.radio.STOP"
         private const val RESUME = "com.rocky35.radio.RESUME"
+        private const val COPY = "com.rocky35.radio.COPY"
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
         data class Snapshot(val id:String, val name:String, val phase:String, val message:String, val title:String="")
         private var state = Snapshot("","","idle","Lista para escuchar")
         private val listeners = linkedSetOf<(Snapshot)->Unit>()
         fun snapshot():Snapshot = state
+        fun copyToClipboard(c:Context,text:String){
+            c.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Tema",text))
+            if(Build.VERSION.SDK_INT<33)android.widget.Toast.makeText(c,"Copiado: $text",android.widget.Toast.LENGTH_SHORT).show()
+        }
         fun observe(listener:(Snapshot)->Unit) { listeners.add(listener);listener(state) }
         fun removeObserver(listener:(Snapshot)->Unit) { listeners.remove(listener) }
         private fun emit(snapshot:Snapshot) {
@@ -116,6 +121,7 @@ class RadioService : Service() {
             override fun onPause(){pausePlayback()}
             override fun onStop(){stopPlayback("stopped","Detenida")}
             override fun onPlay(){if(phase!="playing"&&phase!="loading")resume()}
+            override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->if(song.isNotEmpty())copyToClipboard(this@RadioService,song)}}
         })
         session.setSessionActivity(openApp());session.isActive=true
         try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
@@ -126,6 +132,7 @@ class RadioService : Service() {
             PAUSE->pausePlayback()
             STOP->stopPlayback("stopped","Detenida")
             RESUME->resume()
+            COPY->{if(song.isNotEmpty())copyToClipboard(this,song);if(!foreground)stopSelf()}
             else->stopSelf()
         }
         return START_NOT_STICKY
@@ -220,7 +227,11 @@ class RadioService : Service() {
     private fun publish(p:String,text:String){
         phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
-        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f).build())
+        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
+            .apply{
+                if(p=="playing"&&song.isNotEmpty())addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
+                addCustomAction(PlaybackState.CustomAction.Builder(STOP,"Detener",R.drawable.ic_stop).build())
+            }.build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
     }
     private fun openApp()=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -229,11 +240,13 @@ class RadioService : Service() {
         val active=phase=="playing"||phase=="loading"
         val main=if(active)Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pausa",PendingIntent.getService(this,1,pauseIntent(this),f)).build()
             else Notification.Action.Builder(android.R.drawable.ic_media_play,"Play",PendingIntent.getForegroundService(this,3,resumeIntent(this),f)).build()
-        val stop=Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
-        return Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
+        val stop=Notification.Action.Builder(R.drawable.ic_stop,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
+        val b=Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
             .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
             .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else message).addAction(main).addAction(stop)
-            .setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0,1)).build()
+        val hasSong=phase=="playing"&&song.isNotEmpty()
+        if(hasSong)b.addAction(Notification.Action.Builder(R.drawable.ic_copy,"Copiar",PendingIntent.getService(this,5,Intent(this,RadioService::class.java).setAction(COPY),f)).build())
+        return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).apply{if(hasSong)setShowActionsInCompactView(0,1,2) else setShowActionsInCompactView(0,1)}).build()
     }
     override fun onBind(intent:Intent?):IBinder?=null
     override fun onDestroy(){

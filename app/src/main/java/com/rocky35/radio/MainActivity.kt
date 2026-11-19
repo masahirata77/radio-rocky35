@@ -42,6 +42,7 @@ class MainActivity : Activity() {
     private lateinit var favorite: Button
     private lateinit var volume: SeekBar
     private lateinit var percent: TextView
+    private lateinit var copy: ImageButton
     private lateinit var adapter: StationAdapter
     private val favorites = linkedSetOf<String>()
     private val departments = mutableListOf("", "unknown")
@@ -125,8 +126,10 @@ class MainActivity : Activity() {
         playing.addView(toggle,LinearLayout.LayoutParams(dp(50),dp(50)).apply{marginEnd=dp(10)})
         val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
         favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
-        val volRow=row();volRow.addView(label("Volumen",13f,muted));volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
-        volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent);player.addFull(volRow,40);root.addFull(player)
+        val volRow=row();volRow.addView(ImageView(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(muted);contentDescription="Volumen"},LinearLayout.LayoutParams(dp(22),dp(22)).apply{marginEnd=dp(4)});volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
+        volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent,LinearLayout.LayoutParams(dp(42),-2).apply{marginEnd=dp(6)});gravityEnd(percent)
+        copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar tema";setOnClickListener{copySong()}}
+        volRow.addView(copy,LinearLayout.LayoutParams(dp(45),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
@@ -182,6 +185,7 @@ class MainActivity : Activity() {
         if(now.text!=snap.name)now.text=snap.name
         if(message!=snap.message){message=snap.message;lastRx=-1;showStatus("")}
         if(song!=snap.title){song=snap.title;showStatus(lastRate)}
+        updateCopy()
         if(snap.phase=="playing"&&down.containsKey(selected)){down.remove(selected);refresh()}
         if(change){adapter.notifyDataSetChanged();updatePlayer()}
     }
@@ -200,6 +204,16 @@ class MainActivity : Activity() {
         if(now-lastAt<3000)return
         showStatus(String.format("%.1f kB/s",(rx-lastRx)*1000.0/1024/(now-lastAt)))
         lastRx=rx;lastAt=now
+    }
+    private fun gravityEnd(v:TextView){v.gravity=Gravity.END or Gravity.CENTER_VERTICAL}
+    private fun updateCopy(){
+        if(!::copy.isInitialized)return
+        val on=phase=="playing"&&song.isNotEmpty()
+        if(copy.isEnabled!=on){copy.isEnabled=on;copy.alpha=if(on)1f else .3f}
+    }
+    private fun copySong(){
+        if(song.isEmpty())return
+        RadioService.copyToClipboard(this,song)
     }
     private fun syncVolume(){
         if(!::volume.isInitialized||draggingVolume)return
