@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.media.AudioManager
+import android.net.TrafficStats
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
@@ -64,6 +65,14 @@ class MainActivity : Activity() {
     }
     private val volumeSync = Runnable {syncVolume()}
     private val searchRefresh = Runnable {refresh()}
+    private var message = ""
+    private var lastRx = -1L
+    private var lastAt = 0L
+    private val rateTick = object:Runnable{override fun run(){updateRate();handler.postDelayed(this,1000)}}
+    private val allOn by lazy{shape(Color.rgb(48,72,107))}
+    private val allOff by lazy{shape(panel)}
+    private val favOn by lazy{shape(Color.rgb(48,72,107))}
+    private val favOff by lazy{shape(panel)}
     private fun scheduleSearch(){handler.removeCallbacks(searchRefresh);handler.postDelayed(searchRefresh,100)}
     private fun dp(n: Int) = (n * resources.displayMetrics.density + .5f).toInt()
     private fun shape(c: Int, radius:Int=12, border:Int=0) = GradientDrawable().apply { setColor(c);cornerRadius=dp(radius).toFloat();if(border!=0)setStroke(dp(1),border) }
@@ -118,7 +127,7 @@ class MainActivity : Activity() {
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
         allTab.setOnClickListener{mode(false)};favTab.setOnClickListener{mode(true)}
-        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(Catalog.row(rows[0])[0])}
+        toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(Catalog.id(rows[0]))}
         favorite.setOnClickListener{if(selected.isNotEmpty())flip(selected)}
         volume.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(bar:SeekBar?,p:Int,fromUser:Boolean){if(fromUser)audio.setStreamVolume(AudioManager.STREAM_MUSIC,p,0);percent.text="${p*100/volume.max.coerceAtLeast(1)}%"}
@@ -133,8 +142,8 @@ class MainActivity : Activity() {
         rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
         count.text="${rows.size} radios"
-        allTab.background=shape(if(!onlyFavorites)Color.rgb(48,72,107) else panel)
-        favTab.background=shape(if(onlyFavorites)Color.rgb(48,72,107) else panel)
+        allTab.background=if(!onlyFavorites)allOn else allOff
+        favTab.background=if(onlyFavorites)favOn else favOff
         adapter.notifyDataSetChanged();updatePlayer()
     }
     private fun flip(id:String){if(!favorites.add(id))favorites.remove(id);prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply(); refresh()}
@@ -156,8 +165,21 @@ class MainActivity : Activity() {
         val change=snap.id!=selected||phase!=snap.phase
         selected=snap.id;phase=snap.phase
         if(now.text!=snap.name)now.text=snap.name
-        if(status.text!=snap.message)status.text=snap.message
+        if(message!=snap.message){message=snap.message;lastRx=-1;showStatus("")}
         if(change){adapter.notifyDataSetChanged();updatePlayer()}
+    }
+    private fun showStatus(rate:String){
+        val q=if(selected.isEmpty())"" else Catalog.qualityOf(selected)
+        val t=buildString{append(message.ifEmpty{"Lista para escuchar"});if(phase=="playing"&&q.isNotEmpty())append(" · ").append(q);if(rate.isNotEmpty())append(" · ").append(rate)}
+        if(status.text.toString()!=t)status.text=t
+    }
+    private fun updateRate(){
+        if(!::status.isInitialized)return
+        if(phase!="playing"){lastRx=-1;return}
+        val rx=TrafficStats.getUidRxBytes(Process.myUid());val now=SystemClock.elapsedRealtime()
+        if(rx<0)return
+        if(lastRx>=0&&now>lastAt){showStatus(String.format("%.1f kB/s",(rx-lastRx)*1000.0/1024/(now-lastAt)))}
+        lastRx=rx;lastAt=now
     }
     private fun syncVolume(){
         if(!::volume.isInitialized||draggingVolume)return
@@ -185,13 +207,13 @@ class MainActivity : Activity() {
         RadioService.observe(playbackObserver)
         contentResolver.registerContentObserver(Settings.System.CONTENT_URI,true,volumeObserver)
         audio.registerAudioDeviceCallback(audioDevices,handler)
-        syncVolume()
+        syncVolume();lastRx=-1;handler.post(rateTick)
     }
     override fun onStop(){
         RadioService.removeObserver(playbackObserver)
         contentResolver.unregisterContentObserver(volumeObserver)
         audio.unregisterAudioDeviceCallback(audioDevices)
-        handler.removeCallbacks(volumeSync);handler.removeCallbacks(searchRefresh)
+        handler.removeCallbacks(volumeSync);handler.removeCallbacks(searchRefresh);handler.removeCallbacks(rateTick)
         firstRow=list.firstVisiblePosition
         firstOffset=list.getChildAt(0)?.top?:0
         list.adapter=null
@@ -214,13 +236,13 @@ class MainActivity : Activity() {
             icon.setOnClickListener{listen(id)};labels.setOnClickListener{listen(id)};star.setOnClickListener{flip(id)}
         }
         fun bind(index:Int){
-            val s=Catalog.row(index);if(s.size!=3)return
-            id=s[0];name.text=s[1];department.text=s[2].ifEmpty{"Departamento sin confirmar"}
+            if(index !in 0 until Catalog.size)return
+            id=Catalog.id(index);val nm=Catalog.name(index);name.text=nm;department.text=Catalog.quality(index)
             border.setStroke(dp(1),if(id==selected)blue else line)
             icon.text=if(id==selected&&playing())"Ⅱ" else "▶"
-            icon.contentDescription=(if(id==selected&&playing())"Pausar " else "Escuchar ")+s[1]
+            icon.contentDescription=(if(id==selected&&playing())"Pausar " else "Escuchar ")+nm
             val f=favorites.contains(id);star.text=if(f)"★" else "☆";star.setTextColor(if(f)yellow else muted)
-            star.contentDescription=(if(f)"Quitar de favoritas: " else "Agregar a favoritas: ")+s[1]
+            star.contentDescription=(if(f)"Quitar de favoritas: " else "Agregar a favoritas: ")+nm
         }
     }
     private inner class StationAdapter:BaseAdapter(){

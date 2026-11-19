@@ -9,6 +9,7 @@ android {
         versionCode 2
         versionName '0.1.1'
     }
+    packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
     buildTypes {
         optimized {
             initWith debug

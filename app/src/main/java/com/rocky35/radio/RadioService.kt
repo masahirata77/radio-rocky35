@@ -5,6 +5,8 @@ import android.content.*
 import android.media.*
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.*
 
 class RadioService : Service() {
@@ -43,6 +45,13 @@ class RadioService : Service() {
     private var foreground = false
     private var prepared = false
     private var resumeAfterFocus = false
+    private var round = 0
+    private var retry: Runnable? = null
+    private var builder: Notification.Builder? = null
+    private val delays = longArrayOf(2000,4000,8000,15000,30000)
+    private val network = object: ConnectivityManager.NetworkCallback(){
+        override fun onAvailable(n:Network){handler.post{retry?.let{handler.removeCallbacks(it);retry=null;connect()}}}
+    }
     private val noisy = object: BroadcastReceiver(){
         override fun onReceive(c:Context?,i:Intent?){stopPlayback("paused","En pausa")}
     }
@@ -61,6 +70,7 @@ class RadioService : Service() {
             override fun onPlay(){if(id.isNotEmpty()&&phase!="playing"&&phase!="loading")begin(id)}
         })
         session.setSessionActivity(openApp());session.isActive=true
+        try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
     }
     override fun onStartCommand(intent:Intent?,flags:Int,startId:Int):Int{
         when(intent?.action){
@@ -80,7 +90,7 @@ class RadioService : Service() {
     private fun begin(stationId:String?){
         releasePlayer();resumeAfterFocus=false
         if(stationId==null||!loadStation(stationId)){stopPlayback("error","Emisora no disponible");return}
-        index=0
+        index=0;round=0
         session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,"Radio Rocky 35").build())
         publish("loading","Conectando…")
         if(!foreground){
@@ -100,7 +110,7 @@ class RadioService : Service() {
         try{
             p.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
             p.setWakeMode(this,PowerManager.PARTIAL_WAKE_LOCK)
-            p.setOnPreparedListener{mp->if(player===mp){clearTimeout();try{mp.start();prepared=true;publish("playing","En vivo")}catch(e:RuntimeException){fail(mp)}}}
+            p.setOnPreparedListener{mp->if(player===mp){clearTimeout();try{mp.start();prepared=true;round=0;publish("playing","En vivo")}catch(e:RuntimeException){fail(mp)}}}
             p.setOnErrorListener{mp,_,_->fail(mp);true}
             p.setOnCompletionListener{fail(it)}
             p.setOnInfoListener{mp,what,_->
@@ -113,9 +123,18 @@ class RadioService : Service() {
             p.setDataSource(urls[index]);p.prepareAsync();timeout=Runnable{fail(p)};handler.postDelayed(timeout!!,20000)
         }catch(e:Exception){fail(p)}
     }
-    private fun fail(p:MediaPlayer){if(p===player){index++;connect()}}
+    private fun fail(p:MediaPlayer){
+        if(p!==player)return
+        index++
+        if(index<urls.size){connect();return}
+        releasePlayer();index=0
+        if(round>=delays.size){stopPlayback("error","No se pudo conectar");return}
+        val wait=delays[round++]
+        publish("loading","Reconectando… intento $round de ${delays.size}")
+        val r=Runnable{retry=null;connect()};retry=r;handler.postDelayed(r,wait)
+    }
     private fun clearTimeout(){timeout?.let{handler.removeCallbacks(it)};timeout=null}
-    private fun releasePlayer(){clearTimeout();val old=player;player=null;prepared=false;try{old?.release()}catch(_:RuntimeException){}}
+    private fun releasePlayer(){clearTimeout();retry?.let{handler.removeCallbacks(it)};retry=null;val old=player;player=null;prepared=false;try{old?.release()}catch(_:RuntimeException){}}
     private fun focusChanged(change:Int){
         when(change){
             AudioManager.AUDIOFOCUS_LOSS->stopPlayback("paused","En pausa")
@@ -139,11 +158,15 @@ class RadioService : Service() {
     }
     private fun openApp()=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     private fun notification():Notification{
-        val pause=PendingIntent.getService(this,1,pauseIntent(this),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        return Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentTitle(name).setContentText(message).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(true).addAction(Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pausar",pause).build()).setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0)).build()
+        val b=builder?:run{
+            val pause=PendingIntent.getService(this,1,pauseIntent(this),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(true).addAction(Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pausar",pause).build()).setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0)).also{builder=it}
+        }
+        return b.setContentTitle(name).setContentText(message).build()
     }
     override fun onBind(intent:Intent?):IBinder?=null
     override fun onDestroy(){
+        try{getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(network)}catch(_:RuntimeException){}
         unregisterReceiver(noisy);releasePlayer();if(focus)audio.abandonAudioFocusRequest(focusRequest)
         if(phase=="playing"||phase=="loading")publish("paused","En pausa")
         session.release();super.onDestroy()
