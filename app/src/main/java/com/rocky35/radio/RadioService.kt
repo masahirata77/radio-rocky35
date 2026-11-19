@@ -13,6 +13,8 @@ class RadioService : Service() {
     companion object {
         private const val PLAY = "com.rocky35.radio.PLAY"
         private const val PAUSE = "com.rocky35.radio.PAUSE"
+        private const val STOP = "com.rocky35.radio.STOP"
+        private const val RESUME = "com.rocky35.radio.RESUME"
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
         data class Snapshot(val id:String, val name:String, val phase:String, val message:String)
@@ -28,6 +30,8 @@ class RadioService : Service() {
         }
         @JvmStatic fun playIntent(c:Context,id:String)=Intent(c,RadioService::class.java).setAction(PLAY).putExtra("id",id)
         @JvmStatic fun pauseIntent(c:Context)=Intent(c,RadioService::class.java).setAction(PAUSE)
+        fun stopIntent(c:Context)=Intent(c,RadioService::class.java).setAction(STOP)
+        fun resumeIntent(c:Context)=Intent(c,RadioService::class.java).setAction(RESUME)
     }
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var audio: AudioManager
@@ -47,13 +51,12 @@ class RadioService : Service() {
     private var resumeAfterFocus = false
     private var round = 0
     private var retry: Runnable? = null
-    private var builder: Notification.Builder? = null
     private val delays = longArrayOf(2000,4000,8000,15000,30000)
     private val network = object: ConnectivityManager.NetworkCallback(){
         override fun onAvailable(n:Network){handler.post{retry?.let{handler.removeCallbacks(it);retry=null;connect()}}}
     }
     private val noisy = object: BroadcastReceiver(){
-        override fun onReceive(c:Context?,i:Intent?){stopPlayback("paused","En pausa")}
+        override fun onReceive(c:Context?,i:Intent?){pausePlayback()}
     }
     override fun onCreate(){
         super.onCreate()
@@ -65,9 +68,9 @@ class RadioService : Service() {
         getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL,"Reproducción de radio",NotificationManager.IMPORTANCE_LOW))
         session=MediaSession(this,"RadioRocky35")
         session.setCallback(object: MediaSession.Callback(){
-            override fun onPause(){stopPlayback("paused","En pausa")}
-            override fun onStop(){stopPlayback("paused","En pausa")}
-            override fun onPlay(){if(id.isNotEmpty()&&phase!="playing"&&phase!="loading")begin(id)}
+            override fun onPause(){pausePlayback()}
+            override fun onStop(){stopPlayback("stopped","Detenida")}
+            override fun onPlay(){if(phase!="playing"&&phase!="loading")resume()}
         })
         session.setSessionActivity(openApp());session.isActive=true
         try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
@@ -75,7 +78,9 @@ class RadioService : Service() {
     override fun onStartCommand(intent:Intent?,flags:Int,startId:Int):Int{
         when(intent?.action){
             PLAY->begin(intent.getStringExtra("id"))
-            PAUSE->stopPlayback("paused","En pausa")
+            PAUSE->pausePlayback()
+            STOP->stopPlayback("stopped","Detenida")
+            RESUME->resume()
             else->stopSelf()
         }
         return START_NOT_STICKY
@@ -83,7 +88,7 @@ class RadioService : Service() {
     private fun loadStation(stationId:String):Boolean{
         val station=Catalog.station(stationId)
         if(station.size<2)return false
-        id=stationId;name=station[0]
+        id=stationId;name=station[0];getSharedPreferences("radio",MODE_PRIVATE).edit().putString("last",stationId).apply()
         urls=station.asList().subList(1,station.size)
         return true
     }
@@ -93,11 +98,7 @@ class RadioService : Service() {
         index=0;round=0
         session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,"Radio Rocky 35").build())
         publish("loading","Conectando…")
-        if(!foreground){
-            if(Build.VERSION.SDK_INT>=29)startForeground(NOTIFICATION,notification(),android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
-            else startForeground(NOTIFICATION,notification())
-            foreground=true
-        }
+        ensureForeground()
         if(!focus)focus=audio.requestAudioFocus(focusRequest)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED
         if(!focus){stopPlayback("error","Audio ocupado por otra aplicación");return}
         connect()
@@ -137,17 +138,37 @@ class RadioService : Service() {
     private fun releasePlayer(){clearTimeout();retry?.let{handler.removeCallbacks(it)};retry=null;val old=player;player=null;prepared=false;try{old?.release()}catch(_:RuntimeException){}}
     private fun focusChanged(change:Int){
         when(change){
-            AudioManager.AUDIOFOCUS_LOSS->stopPlayback("paused","En pausa")
+            AudioManager.AUDIOFOCUS_LOSS->pausePlayback()
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT->{resumeAfterFocus=phase=="playing"||phase=="loading";if(resumeAfterFocus){releasePlayer();publish("paused","Audio interrumpido")}}
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK->try{player?.setVolume(.2f,.2f)}catch(_:RuntimeException){}
             AudioManager.AUDIOFOCUS_GAIN->if(resumeAfterFocus){resumeAfterFocus=false;connect()}else try{player?.setVolume(1f,1f)}catch(_:RuntimeException){}
         }
+    }
+    private fun ensureForeground(){
+        if(foreground)return
+        if(Build.VERSION.SDK_INT>=29)startForeground(NOTIFICATION,notification(),android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        else startForeground(NOTIFICATION,notification())
+        foreground=true
+    }
+    private fun resume(){
+        ensureForeground()
+        val last=id.ifEmpty{getSharedPreferences("radio",MODE_PRIVATE).getString("last","")?:""}
+        if(last.isEmpty()){stopPlayback("stopped","Detenida");return}
+        begin(last)
+    }
+    private fun pausePlayback(){
+        resumeAfterFocus=false;releasePlayer()
+        if(focus){audio.abandonAudioFocusRequest(focusRequest);focus=false}
+        publish("paused","En pausa")
+        if(foreground){stopForeground(STOP_FOREGROUND_DETACH);foreground=false}
+        getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
     }
     private fun stopPlayback(p:String,text:String){
         resumeAfterFocus=false;releasePlayer()
         if(focus){audio.abandonAudioFocusRequest(focusRequest);focus=false}
         publish(p,text)
         if(foreground){stopForeground(STOP_FOREGROUND_REMOVE);foreground=false}
+        getSystemService(NotificationManager::class.java).cancel(NOTIFICATION)
         stopSelf()
     }
     private fun publish(p:String,text:String){
@@ -158,11 +179,15 @@ class RadioService : Service() {
     }
     private fun openApp()=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     private fun notification():Notification{
-        val b=builder?:run{
-            val pause=PendingIntent.getService(this,1,pauseIntent(this),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(true).addAction(Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pausar",pause).build()).setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0)).also{builder=it}
-        }
-        return b.setContentTitle(name).setContentText(message).build()
+        val f=PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val active=phase=="playing"||phase=="loading"
+        val main=if(active)Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pausa",PendingIntent.getService(this,1,pauseIntent(this),f)).build()
+            else Notification.Action.Builder(android.R.drawable.ic_media_play,"Play",PendingIntent.getForegroundService(this,3,resumeIntent(this),f)).build()
+        val stop=Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
+        return Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
+            .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
+            .setContentTitle(name).setContentText(message).addAction(main).addAction(stop)
+            .setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0,1)).build()
     }
     override fun onBind(intent:Intent?):IBinder?=null
     override fun onDestroy(){
