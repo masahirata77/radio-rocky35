@@ -151,7 +151,21 @@ class MainActivity : Activity() {
         dirBtn.setOnClickListener{sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
-        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET;setPadding(0,0,dp(14),0);clipToPadding=false}
+        adapter=StationAdapter();list=object:ListView(this@MainActivity){
+            // La estrellita de cada radio tiene prioridad sobre la barra de desplazamiento rápido.
+            override fun onInterceptTouchEvent(ev:MotionEvent):Boolean{
+                if(ev.actionMasked==MotionEvent.ACTION_DOWN&&onStar(ev))return false
+                return super.onInterceptTouchEvent(ev)
+            }
+            private fun onStar(ev:MotionEvent):Boolean{
+                for(i in 0 until childCount){
+                    val c=getChildAt(i);if(ev.y<c.top||ev.y>c.bottom)continue
+                    val st=c.findViewWithTag<View>("star")?:return false
+                    return ev.x>=c.left+st.left-dp(6)
+                }
+                return false
+            }
+        }.apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET;setPadding(0,0,dp(14),0);clipToPadding=false}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
@@ -333,7 +347,7 @@ class MainActivity : Activity() {
         private val labels=col()
         private val name=label("",15f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END}
         private val department=label("",12f,muted)
-        private val star=button("☆",muted).apply{textSize=25f}
+        private val star=button("☆",muted).apply{textSize=25f;tag="star"}
         init{
             orientation=HORIZONTAL;gravity=Gravity.CENTER_VERTICAL;background=border;setPadding(dp(8),dp(5),dp(5),dp(5))
             addView(icon,LayoutParams(dp(44),dp(46)).apply{marginEnd=dp(9)})
