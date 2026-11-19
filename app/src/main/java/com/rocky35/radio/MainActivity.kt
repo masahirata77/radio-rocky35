@@ -44,6 +44,7 @@ class MainActivity : Activity() {
     private lateinit var volume: SeekBar
     private lateinit var percent: TextView
     private lateinit var copy: ImageButton
+    private lateinit var searchBtn: ImageButton
     private lateinit var adapter: StationAdapter
     private val favorites = linkedSetOf<String>()
     private val departments = mutableListOf("", "unknown")
@@ -159,8 +160,9 @@ class MainActivity : Activity() {
         favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
         val volRow=row();volRow.addView(ImageView(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(muted);contentDescription="Volumen"},LinearLayout.LayoutParams(dp(22),dp(22)).apply{marginEnd=dp(4)});volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
         volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent,LinearLayout.LayoutParams(dp(42),-2).apply{marginEnd=dp(6)});gravityEnd(percent)
-        copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar y buscar";setOnClickListener{copySong()}}
-        volRow.addView(copy,LinearLayout.LayoutParams(dp(45),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
+        copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar";setOnClickListener{copySong()}}
+        searchBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_search);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Buscar en el navegador";setOnClickListener{searchSong()}}
+        volRow.addView(copy,LinearLayout.LayoutParams(dp(42),dp(38)).apply{marginEnd=dp(5)});volRow.addView(searchBtn,LinearLayout.LayoutParams(dp(42),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
@@ -242,15 +244,16 @@ class MainActivity : Activity() {
         if(!::copy.isInitialized)return
         val on=phase=="playing"&&song.isNotEmpty()&&song!="🎙 Selección musical"
         if(copy.isEnabled!=on){copy.isEnabled=on;copy.alpha=if(on)1f else .3f}
+        if(::searchBtn.isInitialized&&searchBtn.isEnabled!=on){searchBtn.isEnabled=on;searchBtn.alpha=if(on)1f else .3f}
     }
-    private fun copySong(){
-        if(song.isEmpty())return
-        val prog=song.startsWith("🎙 ")
-        val text=if(prog)"${now.text} · "+song.removePrefix("🎙 ") else song
-        RadioService.copyToClipboard(this,text)
-        val q=if(prog)"${now.text} "+song.removePrefix("🎙 ").substringBefore(" · ") else song
-        try{startActivity(Intent(Intent.ACTION_WEB_SEARCH).putExtra(android.app.SearchManager.QUERY,q))}
-        catch(_:Exception){try{startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))))}catch(_:Exception){}}
+    private fun songText():String?{
+        if(song.isEmpty())return null
+        return if(song.startsWith("🎙 "))"${now.text} · "+song.removePrefix("🎙 ") else song
+    }
+    private fun copySong(){songText()?.let{RadioService.copyToClipboard(this,it)}}
+    private fun searchSong(){
+        val q=(if(song.startsWith("🎙 "))"${now.text} "+song.removePrefix("🎙 ").substringBefore(" · ") else songText())?:return
+        try{startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))).addCategory(Intent.CATEGORY_BROWSABLE))}catch(_:Exception){}
     }
     private fun syncVolume(){
         if(!::volume.isInitialized||draggingVolume)return
