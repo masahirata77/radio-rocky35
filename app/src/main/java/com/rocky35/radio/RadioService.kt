@@ -80,6 +80,13 @@ class RadioService : Service() {
     private var song = ""
     private var titleMisses = 0
     private val io = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private var program = ""
+    private val programTick = object:Runnable{override fun run(){
+        if(!Programs.has(name))return
+        val sid=id
+        try{io.execute{val p=Programs.current(name);handler.post{if(sid==id&&p!=program){program=p;publish(phase,message)}}}}catch(_:RuntimeException){}
+        handler.postDelayed(this,60000)
+    }}
     private val titleTick = object:Runnable{override fun run(){
         if(phase!="playing"&&phase!="loading")return
         handler.postDelayed(this,30000)
@@ -121,7 +128,7 @@ class RadioService : Service() {
             override fun onPause(){pausePlayback()}
             override fun onStop(){stopPlayback("stopped","Detenida")}
             override fun onPlay(){if(phase!="playing"&&phase!="loading")resume()}
-            override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->if(song.isNotEmpty())copyToClipboard(this@RadioService,song)}}
+            override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->copyText()?.let{copyToClipboard(this@RadioService,it)}}}
         })
         session.setSessionActivity(openApp());session.isActive=true
         try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
@@ -132,7 +139,7 @@ class RadioService : Service() {
             PAUSE->pausePlayback()
             STOP->stopPlayback("stopped","Detenida")
             RESUME->resume()
-            COPY->{if(song.isNotEmpty())copyToClipboard(this,song);if(!foreground)stopSelf()}
+            COPY->{copyText()?.let{copyToClipboard(this,it)};if(!foreground)stopSelf()}
             else->stopSelf()
         }
         return START_NOT_STICKY
@@ -149,6 +156,7 @@ class RadioService : Service() {
         if(stationId==null||!loadStation(stationId)){stopPlayback("error","Emisora no disponible");return}
         index=0;round=0;song="";titleMisses=0
         handler.removeCallbacks(titleTick);handler.postDelayed(titleTick,4000)
+        handler.removeCallbacks(programTick);program="";if(Programs.has(name))handler.post(programTick)
         session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,"Radio Rocky 35").build())
         publish("loading","Conectando…")
         ensureForeground()
@@ -225,11 +233,11 @@ class RadioService : Service() {
         stopSelf()
     }
     private fun publish(p:String,text:String){
-        phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song else ""))
+        phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song.ifEmpty{program} else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
-                if(p=="playing"&&song.isNotEmpty())addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
+                if(p=="playing"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
                 addCustomAction(PlaybackState.CustomAction.Builder(STOP,"Detener",R.drawable.ic_stop).build())
             }.build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
@@ -243,17 +251,23 @@ class RadioService : Service() {
         val stop=Notification.Action.Builder(R.drawable.ic_stop,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
         val b=Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
             .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
-            .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else message).addAction(main).addAction(stop)
-        val hasSong=phase=="playing"&&song.isNotEmpty()
+            .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else if(phase=="playing"&&program.isNotEmpty())program else message).addAction(main).addAction(stop)
+        val hasSong=phase=="playing"&&copyText()!=null
         if(hasSong)b.addAction(Notification.Action.Builder(R.drawable.ic_copy,"Copiar",PendingIntent.getService(this,5,Intent(this,RadioService::class.java).setAction(COPY),f)).build())
         return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).apply{if(hasSong)setShowActionsInCompactView(0,1,2) else setShowActionsInCompactView(0,1)}).build()
+    }
+    // Tema si la radio lo manda; si no, radio + programa de la grilla.
+    private fun copyText():String?=when{
+        song.isNotEmpty()->song
+        program.isNotEmpty()&&program!="🎙 Selección musical"->"$name · "+program.removePrefix("🎙 ")
+        else->null
     }
     override fun onBind(intent:Intent?):IBinder?=null
     override fun onDestroy(){
         try{getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(network)}catch(_:RuntimeException){}
         unregisterReceiver(noisy);releasePlayer();if(focus)audio.abandonAudioFocusRequest(focusRequest)
         if(phase=="playing"||phase=="loading")publish("paused","En pausa")
-        handler.removeCallbacks(titleTick);io.shutdownNow()
+        handler.removeCallbacks(titleTick);handler.removeCallbacks(programTick);io.shutdownNow()
         session.release();super.onDestroy()
     }
 }

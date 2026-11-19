@@ -192,7 +192,7 @@ class MainActivity : Activity() {
     private fun showStatus(rate:String){
         val q=if(selected.isEmpty())"" else Catalog.qualityOf(selected)
         lastRate=rate
-        val t=buildString{if(phase=="playing"&&song.isNotEmpty())append("♪ ").append(song) else {append(message.ifEmpty{"Lista para escuchar"});if(phase=="playing"&&q.isNotEmpty())append(" · ").append(q)};if(rate.isNotEmpty())append(" · ").append(rate)}
+        val t=buildString{if(phase=="playing"&&song.isNotEmpty()){if(!song.startsWith("🎙"))append("♪ ");append(song)} else {append(message.ifEmpty{"Lista para escuchar"});if(phase=="playing"&&q.isNotEmpty())append(" · ").append(q)};if(rate.isNotEmpty())append(" · ").append(rate)}
         if(status.text.toString()!=t)status.text=t
     }
     private fun updateRate(){
@@ -208,12 +208,12 @@ class MainActivity : Activity() {
     private fun gravityEnd(v:TextView){v.gravity=Gravity.END or Gravity.CENTER_VERTICAL}
     private fun updateCopy(){
         if(!::copy.isInitialized)return
-        val on=phase=="playing"&&song.isNotEmpty()
+        val on=phase=="playing"&&song.isNotEmpty()&&song!="🎙 Selección musical"
         if(copy.isEnabled!=on){copy.isEnabled=on;copy.alpha=if(on)1f else .3f}
     }
     private fun copySong(){
         if(song.isEmpty())return
-        RadioService.copyToClipboard(this,song)
+        RadioService.copyToClipboard(this,if(song.startsWith("🎙 "))"${now.text} · "+song.removePrefix("🎙 ") else song)
     }
     private fun syncVolume(){
         if(!::volume.isInitialized||draggingVolume)return
