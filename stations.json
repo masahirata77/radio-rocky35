@@ -305,12 +305,12 @@
     "name": "Laser FM",
     "url": "https://server.laradio.online/proxy/eduardo_correa?mp=/stream",
     "original": "https://server.laradio.online/proxy/eduardo_correa?mp=/stream",
-    "state": "",
+    "state": "Maldonado",
     "tags": "entretenimiento,información,musica",
     "codec": "MP3",
     "bitrate": 128,
     "website": "http://www.laserfm.com.uy/",
-    "department": null
+    "department": "Maldonado"
   },
   {
     "id": "e52d66f7-9b0d-44b5-ad37-6632e14249bf",
@@ -746,12 +746,12 @@
     "name": "Atlantida FM 89.9",
     "url": "http://server-uk1.radioseninternet.net:8034/;",
     "original": "http://server-uk1.radioseninternet.net:8034/;",
-    "state": "",
+    "state": "Canelones",
     "tags": "80s,90s,classic hits,hits 80s",
     "codec": "AAC+",
     "bitrate": 72,
     "website": "https://atlantidafm.com.uy/",
-    "department": null
+    "department": "Canelones"
   },
   {
     "id": "06e2a1c6-be97-448f-98e7-435e4834ce27",
@@ -878,12 +878,12 @@
     "name": "FM Buenos Aires 104.1",
     "url": "http://radio.solumedia.com.ar:8352/stream",
     "original": "http://radio.solumedia.com.ar:8352/stream",
-    "state": "",
+    "state": "Maldonado",
     "tags": "baladas en español,hits,musica romantica,música en español e inglés,música variada",
     "codec": "AAC+",
     "bitrate": 96,
     "website": "https://fmbuenosaires.net/",
-    "department": null
+    "department": "Maldonado"
   },
   {
     "id": "892427cc-ee5a-499b-98e3-145cf93d02b8",
@@ -1425,24 +1425,24 @@
     "name": "90.1 FM Ideal",
     "url": "https://streaming3.locucionar.com/proxy/fmideal901?mp=/stream",
     "original": "https://streaming3.locucionar.com/proxy/fmideal901?mp=/stream",
-    "state": "",
+    "state": "Canelones",
     "tags": "",
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": ""
+    "department": "Canelones"
   },
   {
     "id": "e3cc7884-faa5-50ba-8fdb-24bdc419ea64",
     "name": "Acuario FM 94.9",
     "url": "https://radio25-zikoxstream.radioca.st/stream",
     "original": "https://radio25-zikoxstream.radioca.st/stream",
-    "state": "",
+    "state": "Rocha",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Rocha"
   },
   {
     "id": "3dff920c-160c-526a-9d96-75f14050b17b",
@@ -1473,36 +1473,36 @@
     "name": "Brava FM",
     "url": "https://fmbrava-2.nty.uy/",
     "original": "https://fmbrava-2.nty.uy/",
-    "state": "",
+    "state": "Maldonado",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Maldonado"
   },
   {
     "id": "3cfdf459-7df5-5b11-b2b7-0197581c5f23",
     "name": "Cafe Express Radio",
     "url": "https://streaming5.locucionar.com/proxy/cafeexpress?mp=/stream",
     "original": "https://streaming5.locucionar.com/proxy/cafeexpress?mp=/stream",
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "be2f10b1-370e-58e5-b1b5-beb1326bad57",
     "name": "Ciudadana La Gaviota",
     "url": "https://stream.zeno.fm/65h59sw071zuv",
     "original": "https://stream.zeno.fm/65h59sw071zuv",
-    "state": "",
+    "state": "Canelones",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Canelones"
   },
   {
     "id": "d7cccfcc-354a-58c2-a6af-5d330f7739c1",
@@ -1521,12 +1521,12 @@
     "name": "De La Nuca FM",
     "url": "https://stm.gmpro.top:7070/stream",
     "original": "https://stm.gmpro.top:7070/stream",
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "9bfa812f-cb2f-57cd-8773-6e9936f901d4",
@@ -1537,12 +1537,12 @@
       "https://sp2.servidorrprivado.com:10878/;",
       "https://sp2.servidorrprivado.com:10878/stream"
     ],
-    "state": "",
+    "state": "Canelones",
     "tags": "",
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": ""
+    "department": "Canelones"
   },
   {
     "id": "66bc06b1-c339-5366-ad12-cf564d65188d",
@@ -1589,24 +1589,24 @@
       "http://radios.iwstreaming.uy:8034/stream/1/",
       "https://ssl1.surfmusik.de/s.php?s=http://radios.iwstreaming.uy:8034/stream/1/"
     ],
-    "state": "",
+    "state": "Flores",
     "tags": "",
     "codec": "MP3",
     "bitrate": 64,
     "website": "",
-    "department": ""
+    "department": "Flores"
   },
   {
     "id": "805d61e8-c4a9-5280-95fd-c6153a368bd3",
     "name": "Emisora Libertad 88.5",
     "url": "https://radio.plandos.com/8064/stream",
     "original": "https://radio.plandos.com/8064/stream",
-    "state": "",
+    "state": "San José",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
-    "website": "",
-    "department": ""
+    "website": "https://emisoralibertad.uy/",
+    "department": "San José"
   },
   {
     "id": "ced4b355-124e-5802-97d1-7f958826f0db",
@@ -1625,12 +1625,12 @@
     "name": "FM Gente",
     "url": "https://cast1.asurahosting.com/proxy/btsasalv/stream",
     "original": "https://cast1.asurahosting.com/proxy/btsasalv/stream",
-    "state": "",
+    "state": "Maldonado",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Maldonado"
   },
   {
     "id": "a82d85da-4f50-5347-b6ce-a2a98d103219",
@@ -1641,12 +1641,12 @@
       "https://playerservices.streamtheworld.com/api/livestream-redirect/MAGICAAAC.aac?dist=onlineradiobox",
       "https://playerservices.streamtheworld.com/api/livestream-redirect/MAGICA_SC"
     ],
-    "state": "",
+    "state": "Colonia",
     "tags": "",
     "codec": "AAC",
     "bitrate": 64,
     "website": "",
-    "department": ""
+    "department": "Colonia"
   },
   {
     "id": "96376b14-0375-52cb-8276-50520c3edb75",
@@ -1665,12 +1665,12 @@
     "name": "FM93.UY",
     "url": "https://s47.myradiostream.com:12110/listen.m4a",
     "original": "https://s47.myradiostream.com:12110/listen.m4a",
-    "state": "",
+    "state": "Tacuarembó",
     "tags": "",
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "Tacuarembó"
   },
   {
     "id": "c305245e-eb82-53d0-b1cc-e8183329ec19",
@@ -1689,24 +1689,24 @@
     "name": "Full Metal City Radio",
     "url": "https://stream.zeno.fm/rizy824qnlutv",
     "original": "https://stream.zeno.fm/rizy824qnlutv",
-    "state": "",
+    "state": "Río Negro",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Río Negro"
   },
   {
     "id": "cccaab0f-b8fa-57a8-828b-6ef089c8d1e0",
     "name": "Info Ideas Radio",
     "url": "https://infoideas-zikoxweb2.radioca.st/stream;.mp3",
     "original": "https://infoideas-zikoxweb2.radioca.st/stream;.mp3",
-    "state": "",
+    "state": "Lavalleja",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Lavalleja"
   },
   {
     "id": "e0378c8a-395c-5f4e-9796-1c54804fb02c",
@@ -1789,12 +1789,12 @@
     "name": "Neri De Los Santos - Despertar Producciones",
     "url": "https://srv1.radiostreamuy.com/listen/neri_de_los_santos/radio.mp3",
     "original": "https://srv1.radiostreamuy.com/listen/neri_de_los_santos/radio.mp3",
-    "state": "",
+    "state": "Tacuarembó",
     "tags": "",
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "Tacuarembó"
   },
   {
     "id": "81e0cbae-ee97-5231-9036-28857f5e4ed3",
@@ -1837,24 +1837,24 @@
     "name": "Onda Marina 106.3 FM",
     "url": "https://marina-2.nty.uy/",
     "original": "https://marina-2.nty.uy/",
-    "state": "",
+    "state": "Rocha",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Rocha"
   },
   {
     "id": "489f4c70-5609-5d57-aa19-040bde43a267",
     "name": "Osiris FM",
     "url": "https://streaming6.locucionar.com/stream/905osirisfm",
     "original": "https://streaming6.locucionar.com/stream/905osirisfm",
-    "state": "",
+    "state": "Durazno",
     "tags": "",
     "codec": "AAC",
     "bitrate": 320,
     "website": "",
-    "department": ""
+    "department": "Durazno"
   },
   {
     "id": "151bfcc6-aa8e-5b71-9ae3-d9bf407750b9",
@@ -1877,12 +1877,12 @@
       "http://host.psyradio.fm:8010/;listen.mp3",
       "https://ssl1.surfmusik.de/s.php?s=http://host.psyradio.fm:8010/;listen.mp3"
     ],
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "465d032a-9290-5896-9e78-277560201fb2",
@@ -1937,12 +1937,12 @@
     "name": "Radio Aurora Digital",
     "url": "http://198.204.234.10:8229/stream/1/",
     "original": "http://198.204.234.10:8229/stream/1/",
-    "state": "",
+    "state": "Lavalleja",
     "tags": "",
     "codec": "MP3",
     "bitrate": 256,
     "website": "",
-    "department": ""
+    "department": "Lavalleja"
   },
   {
     "id": "e3ef6d76-4a29-5c6a-bbd0-cce0986e85c6",
@@ -1961,12 +1961,12 @@
     "name": "Radio Charrua",
     "url": "https://cast.youngtech.radio.br/radio/8780/fm",
     "original": "https://cast.youngtech.radio.br/radio/8780/fm",
-    "state": "",
+    "state": "Paysandú",
     "tags": "",
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": ""
+    "department": "Paysandú"
   },
   {
     "id": "6b3b81b2-677b-5708-bf50-01b0e0d2391d",
@@ -2037,12 +2037,12 @@
     "name": "Radio El Tiempo",
     "url": "http://emisiones.com.uy:8086/turistic",
     "original": "http://emisiones.com.uy:8086/turistic",
-    "state": "",
+    "state": "Tacuarembó",
     "tags": "",
     "codec": "MP3",
     "bitrate": 64,
     "website": "",
-    "department": ""
+    "department": "Tacuarembó"
   },
   {
     "id": "abbf83e9-515a-5726-9aaa-b407ad15f1ce",
@@ -2061,12 +2061,12 @@
     "name": "Radio Extravagante FM",
     "url": "https://stream.zeno.fm/61epffwku0quv",
     "original": "https://stream.zeno.fm/61epffwku0quv",
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "c17b23a5-2450-53f7-a891-f691acc63c7f",
@@ -2121,36 +2121,36 @@
     "name": "Radio Norte Uy",
     "url": "https://s2.servicioderadio.com/8580/stream",
     "original": "https://s2.servicioderadio.com/8580/stream",
-    "state": "",
+    "state": "Artigas",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Artigas"
   },
   {
     "id": "1f757bdf-5086-5d4b-9557-ace4820e9939",
     "name": "Radio Planeta UY",
     "url": "https://stream.zeno.fm/9y3dskfdwnhvv",
     "original": "https://stream.zeno.fm/9y3dskfdwnhvv",
-    "state": "",
+    "state": "Salto",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Salto"
   },
   {
     "id": "625191de-127a-5e41-b103-89e373ef2af0",
     "name": "Radio Punto Centro",
     "url": "https://stream.zeno.fm/ks3a5u8yfm8uv",
     "original": "https://stream.zeno.fm/ks3a5u8yfm8uv",
-    "state": "",
+    "state": "Artigas",
     "tags": "",
     "codec": "AAC",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Artigas"
   },
   {
     "id": "592099c0-4160-548c-990b-8caebcf65770",
@@ -2169,36 +2169,36 @@
     "name": "Radio Rincón",
     "url": "http://88.198.5.134:8145/stream",
     "original": "http://88.198.5.134:8145/stream",
-    "state": "",
+    "state": "Río Negro",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Río Negro"
   },
   {
     "id": "ef0c87e5-86f6-58f4-b3b1-2299123e7495",
     "name": "Radio Salvacion Paso",
     "url": "https://stream.zeno.fm/aatlwy8lr1gvv",
     "original": "https://stream.zeno.fm/aatlwy8lr1gvv",
-    "state": "",
+    "state": "Tacuarembó",
     "tags": "",
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": ""
+    "department": "Tacuarembó"
   },
   {
     "id": "ff62fa77-4172-5be6-8ca5-d1408a1f88f0",
     "name": "Radio San Salvador",
     "url": "http://server-uk1.radioseninternet.net:8270/;",
     "original": "http://server-uk1.radioseninternet.net:8270/;",
-    "state": "",
+    "state": "Soriano",
     "tags": "",
     "codec": "MP3",
     "bitrate": 320,
     "website": "",
-    "department": ""
+    "department": "Soriano"
   },
   {
     "id": "fad5537f-17b5-57a3-a44e-a60784ab91be",
@@ -2301,24 +2301,24 @@
     "name": "Recital Radio",
     "url": "https://recital-zikoxweb2.radioca.st/;",
     "original": "https://recital-zikoxweb2.radioca.st/;",
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "AAC",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "5f23b6ad-58f1-57d7-812a-25f0b5a65eab",
     "name": "Retro Music Uruguay",
     "url": "https://retroleo-zikoxweb.radioca.st/;",
     "original": "https://retroleo-zikoxweb.radioca.st/;",
-    "state": "",
+    "state": "Montevideo",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Montevideo"
   },
   {
     "id": "01fa2602-b771-5a3f-aa14-f087db992745",
@@ -2373,48 +2373,48 @@
     "name": "Stereo Norte FM",
     "url": "http://usa15.ciudaddigital.com.uy:8044/NorteFM",
     "original": "http://usa15.ciudaddigital.com.uy:8044/NorteFM",
-    "state": "",
+    "state": "Artigas",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Artigas"
   },
   {
     "id": "ec5f4e7b-4dd7-5bee-b418-3e2f23df3937",
     "name": "U-20 Radio On Line",
     "url": "https://stream.zeno.fm/ddkxgd9sywzuv",
     "original": "https://stream.zeno.fm/ddkxgd9sywzuv",
-    "state": "",
+    "state": "Lavalleja",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Lavalleja"
   },
   {
     "id": "50d431cd-bda8-58e4-960b-2d987cad927c",
     "name": "Vida FM 104.7",
     "url": "http://usa15.ciudaddigital.com.uy:8048/VidaFM",
     "original": "http://usa15.ciudaddigital.com.uy:8048/VidaFM",
-    "state": "",
+    "state": "Rocha",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Rocha"
   },
   {
     "id": "a32a4c0f-3f58-58f5-8cd0-3b0271014559",
     "name": "Vision FM 96.5",
     "url": "http://emisiones.com.uy:8108/vision",
     "original": "http://emisiones.com.uy:8108/vision",
-    "state": "",
+    "state": "Río Negro",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "Río Negro"
   },
   {
     "id": "12e782b6-9d65-5c86-87df-c50d4c1fb64e",
@@ -2613,12 +2613,12 @@
     "name": "Color FM",
     "url": "https://streaming6.locucionar.com:24134/stream",
     "original": "https://streaming6.locucionar.com:24134/stream",
-    "state": "",
+    "state": "Soriano",
     "tags": "",
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/color-fm",
-    "department": ""
+    "department": "Soriano"
   },
   {
     "id": "07f7edc8-0227-595b-a6e5-5d9594884eaf",
@@ -2889,12 +2889,12 @@
     "name": "Radio Agraria",
     "url": "https://stm.gmpro.top:7034/stream",
     "original": "https://stm.gmpro.top:7034/stream",
-    "state": "",
+    "state": "Florida",
     "tags": "",
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/radio-agraria",
-    "department": ""
+    "department": "Florida"
   },
   {
     "id": "bdd375ce-8a29-5c09-bd0e-4d5f9d5ab196",
