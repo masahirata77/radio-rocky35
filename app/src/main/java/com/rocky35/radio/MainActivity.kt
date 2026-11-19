@@ -136,12 +136,12 @@ class MainActivity : Activity() {
         })
         refresh();syncPlayback(RadioService.snapshot());syncVolume()
     }
-    private fun mode(f:Boolean){handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();list.setSelection(0)}
+    private fun mode(f:Boolean){handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();if(rows.isNotEmpty())list.setSelection(0)}
     private fun refresh(){
         if(!::adapter.isInitialized||detached)return
         rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
-        count.text="${rows.size} radios"
+        count.text=if(onlyFavorites&&favorites.isEmpty())"Tocá ☆ en una radio" else "${rows.size} radios"
         allTab.background=if(!onlyFavorites)allOn else allOff
         favTab.background=if(onlyFavorites)favOn else favOff
         adapter.notifyDataSetChanged();updatePlayer()
@@ -247,8 +247,8 @@ class MainActivity : Activity() {
     }
     private inner class StationAdapter:BaseAdapter(){
         override fun getCount()=rows.size
-        override fun getItem(position:Int)=rows[position]
-        override fun getItemId(position:Int)=rows[position].toLong()
+        override fun getItem(position:Int)=rows.getOrElse(position){-1}
+        override fun getItemId(position:Int)=rows.getOrElse(position){-1}.toLong()
         override fun hasStableIds()=true
         override fun getView(position:Int,convertView:View?,parent:ViewGroup?):View{
             return (convertView as? StationRow ?: StationRow()).apply{bind(getItem(position))}
