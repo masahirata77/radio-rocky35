@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application android:label="Radio Rocky 35 Kotlin" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:theme="@style/AppTheme" android:usesCleartextTraffic="true" android:allowBackup="false">
         <service android:name=".RadioService" android:exported="false" android:foregroundServiceType="mediaPlayback" android:stopWithTask="false"/>
         <activity android:name=".MainActivity" android:exported="true">

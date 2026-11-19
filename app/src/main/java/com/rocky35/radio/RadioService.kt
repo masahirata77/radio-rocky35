@@ -16,6 +16,7 @@ class RadioService : Service() {
         private const val STOP = "com.rocky35.radio.STOP"
         private const val RESUME = "com.rocky35.radio.RESUME"
         private const val COPY = "com.rocky35.radio.COPY"
+        private const val SEARCH = "com.rocky35.radio.SEARCH"
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
         data class Snapshot(val id:String, val name:String, val phase:String, val message:String, val title:String="")
@@ -128,7 +129,7 @@ class RadioService : Service() {
             override fun onPause(){pausePlayback()}
             override fun onStop(){stopPlayback("stopped","Detenida")}
             override fun onPlay(){if(phase!="playing"&&phase!="loading")resume()}
-            override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->copyText()?.let{copyToClipboard(this@RadioService,it)}}}
+            override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->copyText()?.let{copyToClipboard(this@RadioService,it)};SEARCH->searchPrompt()}}
         })
         session.setSessionActivity(openApp());session.isActive=true
         try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
@@ -238,6 +239,7 @@ class RadioService : Service() {
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
                 if(p=="playing"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
+                if(p=="playing"&&searchIntent()!=null)addCustomAction(PlaybackState.CustomAction.Builder(SEARCH,"Buscar",R.drawable.ic_search).build())
                 addCustomAction(PlaybackState.CustomAction.Builder(STOP,"Detener",R.drawable.ic_stop).build())
             }.build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
@@ -254,6 +256,8 @@ class RadioService : Service() {
             .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else if(phase=="playing"&&program.isNotEmpty())program else message).addAction(main).addAction(stop)
         val hasSong=phase=="playing"&&copyText()!=null
         if(hasSong)b.addAction(Notification.Action.Builder(R.drawable.ic_copy,"Copiar",PendingIntent.getService(this,5,Intent(this,RadioService::class.java).setAction(COPY),f)).build())
+        val web=if(phase=="playing")searchIntent() else null
+        if(web!=null)b.addAction(Notification.Action.Builder(R.drawable.ic_search,"Buscar",PendingIntent.getActivity(this,6,web,f)).build())
         return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).apply{if(hasSong)setShowActionsInCompactView(0,1,2) else setShowActionsInCompactView(0,1)}).build()
     }
     // Tema si la radio lo manda; si no, radio + programa de la grilla.
@@ -261,6 +265,25 @@ class RadioService : Service() {
         song.isNotEmpty()->song
         program.isNotEmpty()&&program!="🎙 Selección musical"->"$name · "+program.removePrefix("🎙 ")
         else->null
+    }
+    // Android no deja abrir el navegador desde el reproductor de la persiana (bloqueo de inicio en segundo plano),
+    // así que se muestra un aviso: al tocarlo, el sistema sí permite abrir la búsqueda.
+    private fun searchPrompt(){
+        val web=searchIntent()?:return
+        val nm=getSystemService(NotificationManager::class.java)
+        if(nm.getNotificationChannel("radio_search")==null)nm.createNotificationChannel(NotificationChannel("radio_search","Buscar tema o programa",NotificationManager.IMPORTANCE_HIGH).apply{setSound(null,null);enableVibration(false)})
+        val q=android.net.Uri.parse(web.dataString).getQueryParameter("q")?:""
+        nm.notify(36,Notification.Builder(this,"radio_search").setSmallIcon(R.drawable.ic_search).setContentTitle("🔎 Tocá para buscar").setContentText(q)
+            .setContentIntent(PendingIntent.getActivity(this,7,web,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)).setAutoCancel(true).setTimeoutAfter(20000).setCategory(Notification.CATEGORY_RECOMMENDATION).build())
+    }
+    // Búsqueda directa: tema si hay; si no, radio + nombre del programa.
+    private fun searchIntent():Intent?{
+        val q=when{
+            song.isNotEmpty()->song
+            program.isNotEmpty()&&program!="🎙 Selección musical"->"$name "+program.removePrefix("🎙 ").substringBefore(" · ")
+            else->return null
+        }
+        return Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))).addCategory(Intent.CATEGORY_BROWSABLE)
     }
     override fun onBind(intent:Intent?):IBinder?=null
     override fun onDestroy(){

@@ -164,6 +164,7 @@ class MainActivity : Activity() {
         searchBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_search);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Buscar en el navegador";setOnClickListener{searchSong()}}
         volRow.addView(copy,LinearLayout.LayoutParams(dp(42),dp(38)).apply{marginEnd=dp(5)});volRow.addView(searchBtn,LinearLayout.LayoutParams(dp(42),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
+        if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!prefs.getBoolean("askedNotif",false)){prefs.edit().putBoolean("askedNotif",true).apply();requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),35)}
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
         allTab.setOnClickListener{mode(false)};favTab.setOnClickListener{mode(true)}
