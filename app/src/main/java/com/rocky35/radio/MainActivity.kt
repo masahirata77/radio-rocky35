@@ -66,6 +66,10 @@ class MainActivity : Activity() {
     private val volumeSync = Runnable {syncVolume()}
     private val searchRefresh = Runnable {refresh()}
     private var message = ""
+    private var song = ""
+    private var lastRate = ""
+    private var down = HashMap<String,Int>()
+    private val alert = Color.rgb(255,138,128)
     private var lastRx = -1L
     private var lastAt = 0L
     private val rateTick = object:Runnable{override fun run(){updateRate();handler.postDelayed(this,1000)}}
@@ -119,7 +123,7 @@ class MainActivity : Activity() {
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
         playing.addView(toggle,LinearLayout.LayoutParams(dp(50),dp(50)).apply{marginEnd=dp(10)})
-        val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted);info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
+        val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
         favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
         val volRow=row();volRow.addView(label("Volumen",13f,muted));volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
         volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent);player.addFull(volRow,40);root.addFull(player)
@@ -135,11 +139,22 @@ class MainActivity : Activity() {
             override fun onStopTrackingTouch(bar:SeekBar?){draggingVolume=false;syncVolume()}
         })
         refresh();syncPlayback(RadioService.snapshot());syncVolume()
+        if(selected.isEmpty()){
+            val last=prefs.getString("last","")?:"";val st=if(last.isEmpty())emptyArray() else Catalog.station(last)
+            if(st.isNotEmpty()){selected=last;now.text=st[0];message="Tocá ▶ para escuchar";showStatus("");updatePlayer();adapter.notifyDataSetChanged()}
+        }
     }
     private fun mode(f:Boolean){handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();if(rows.isNotEmpty())list.setSelection(0)}
     private fun refresh(){
         if(!::adapter.isInitialized||detached)return
         rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
+        down=Health.read(prefs)
+        if(down.isNotEmpty()){
+            val r=rows;val a=IntArray(r.size);var n=0
+            for(i in r){val f=down[Catalog.id(i)]?:0;if(f==0)a[n++]=i}
+            for(i in r){val sid=Catalog.id(i);val f=down[sid]?:0;if(f in 1 until Health.HIDE||(f>=Health.HIDE&&sid==selected))a[n++]=i}
+            rows=a.copyOf(n)
+        }
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
         count.text=if(onlyFavorites&&favorites.isEmpty())"Tocá ☆ en una radio" else "${rows.size} radios"
         allTab.background=if(!onlyFavorites)allOn else allOff
@@ -166,11 +181,14 @@ class MainActivity : Activity() {
         selected=snap.id;phase=snap.phase
         if(now.text!=snap.name)now.text=snap.name
         if(message!=snap.message){message=snap.message;lastRx=-1;showStatus("")}
+        if(song!=snap.title){song=snap.title;showStatus(lastRate)}
+        if(snap.phase=="playing"&&down.containsKey(selected)){down.remove(selected);refresh()}
         if(change){adapter.notifyDataSetChanged();updatePlayer()}
     }
     private fun showStatus(rate:String){
         val q=if(selected.isEmpty())"" else Catalog.qualityOf(selected)
-        val t=buildString{append(message.ifEmpty{"Lista para escuchar"});if(phase=="playing"&&q.isNotEmpty())append(" · ").append(q);if(rate.isNotEmpty())append(" · ").append(rate)}
+        lastRate=rate
+        val t=buildString{if(phase=="playing"&&song.isNotEmpty())append("♪ ").append(song) else {append(message.ifEmpty{"Lista para escuchar"});if(phase=="playing"&&q.isNotEmpty())append(" · ").append(q)};if(rate.isNotEmpty())append(" · ").append(rate)}
         if(status.text.toString()!=t)status.text=t
     }
     private fun updateRate(){
@@ -178,7 +196,9 @@ class MainActivity : Activity() {
         if(phase!="playing"){lastRx=-1;return}
         val rx=TrafficStats.getUidRxBytes(Process.myUid());val now=SystemClock.elapsedRealtime()
         if(rx<0)return
-        if(lastRx>=0&&now>lastAt){showStatus(String.format("%.1f kB/s",(rx-lastRx)*1000.0/1024/(now-lastAt)))}
+        if(lastRx<0){lastRx=rx;lastAt=now;return}
+        if(now-lastAt<3000)return
+        showStatus(String.format("%.1f kB/s",(rx-lastRx)*1000.0/1024/(now-lastAt)))
         lastRx=rx;lastAt=now
     }
     private fun syncVolume(){
@@ -207,7 +227,38 @@ class MainActivity : Activity() {
         RadioService.observe(playbackObserver)
         contentResolver.registerContentObserver(Settings.System.CONTENT_URI,true,volumeObserver)
         audio.registerAudioDeviceCallback(audioDevices,handler)
-        syncVolume();lastRx=-1;handler.post(rateTick)
+        syncVolume();lastRx=-1;handler.post(rateTick);checkStations()
+    }
+    private fun checkStations(){
+        val t=System.currentTimeMillis()
+        if(t-prefs.getLong("checkedAt",0L)<12*3600_000L)return
+        val cm=getSystemService(android.net.ConnectivityManager::class.java)
+        if(cm.activeNetwork==null||cm.isActiveNetworkMetered)return
+        prefs.edit().putLong("checkedAt",t).apply()
+        val store=applicationContext.getSharedPreferences("radio",MODE_PRIVATE)
+        Thread{
+            val pool=java.util.concurrent.Executors.newFixedThreadPool(6)
+            val dead=java.util.Collections.synchronizedSet(HashSet<String>())
+            for(i in 0 until Catalog.size){val sid=Catalog.id(i);pool.execute{val st=Catalog.station(sid);if(st.size>1&&st.drop(1).none{alive(it)})dead.add(sid)}}
+            pool.shutdown();pool.awaitTermination(10,java.util.concurrent.TimeUnit.MINUTES)
+            if(dead.size<Catalog.size/3){
+                val old=Health.read(store);val m=HashMap<String,Int>()
+                for(sid in dead)m[sid]=(old[sid]?:0)+1
+                Health.write(store,m);handler.post{if(!isDestroyed)refresh()}
+            }
+            else store.edit().putLong("checkedAt",0L).apply()
+        }.start()
+    }
+    private fun alive(u:String):Boolean{
+        var c:java.net.HttpURLConnection?=null
+        return try{
+            c=java.net.URL(u).openConnection() as java.net.HttpURLConnection
+            c.connectTimeout=8000;c.readTimeout=8000;c.setRequestProperty("User-Agent","RadioRocky35")
+            if(c.responseCode !in 200..299)return false
+            val b=ByteArray(4096);var n=0;val inp=c.inputStream
+            while(n<4096){val r=inp.read(b,n,4096-n);if(r<0)break;n+=r}
+            n>=1024
+        }catch(e:Exception){false}finally{try{c?.disconnect()}catch(_:Exception){}}
     }
     override fun onStop(){
         RadioService.removeObserver(playbackObserver)
@@ -237,7 +288,8 @@ class MainActivity : Activity() {
         }
         fun bind(index:Int){
             if(index !in 0 until Catalog.size)return
-            id=Catalog.id(index);val nm=Catalog.name(index);name.text=nm;department.text=Catalog.quality(index)
+            id=Catalog.id(index);val nm=Catalog.name(index);name.text=nm
+            val off=down.containsKey(id);department.text=if(off)"Sin señal · "+Catalog.quality(index) else Catalog.quality(index);department.setTextColor(if(off)alert else muted)
             border.setStroke(dp(1),if(id==selected)blue else line)
             icon.text=if(id==selected&&playing())"Ⅱ" else "▶"
             icon.contentDescription=(if(id==selected&&playing())"Pausar " else "Escuchar ")+nm

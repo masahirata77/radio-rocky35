@@ -17,7 +17,7 @@ class RadioService : Service() {
         private const val RESUME = "com.rocky35.radio.RESUME"
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
-        data class Snapshot(val id:String, val name:String, val phase:String, val message:String)
+        data class Snapshot(val id:String, val name:String, val phase:String, val message:String, val title:String="")
         private var state = Snapshot("","","idle","Lista para escuchar")
         private val listeners = linkedSetOf<(Snapshot)->Unit>()
         fun snapshot():Snapshot = state
@@ -27,6 +27,28 @@ class RadioService : Service() {
             if(state==snapshot)return
             state=snapshot
             listeners.toList().forEach{it(snapshot)}
+        }
+        private val junk=listOf("hi-fi internet","azuracast","mike llama","audiocheck","use http","http","www.","sinsonido","en vivo","stream")
+        fun fetchTitle(u:String):String?{
+            var c:java.net.HttpURLConnection?=null
+            return try{
+                c=java.net.URL(u).openConnection() as java.net.HttpURLConnection
+                c.connectTimeout=8000;c.readTimeout=8000;c.setRequestProperty("Icy-MetaData","1");c.setRequestProperty("User-Agent","RadioRocky35")
+                val mi=c.getHeaderField("icy-metaint")?.trim()?.toIntOrNull()?:return null
+                if(mi<=0||mi>65536)return null
+                val inp=java.io.DataInputStream(java.io.BufferedInputStream(c.inputStream,8192))
+                inp.readFully(ByteArray(mi))
+                val len=inp.read()*16;if(len<=0)return ""
+                val m=ByteArray(len);inp.readFully(m)
+                var s=String(m,Charsets.UTF_8);if('\uFFFD' in s)s=String(m,Charsets.ISO_8859_1)
+                Regex("StreamTitle='(.*?)';").find(s)?.groupValues?.get(1)?.trim()
+            }catch(e:Exception){null}finally{try{c?.disconnect()}catch(_:Exception){}}
+        }
+        fun usefulTitle(t:String?,station:String):Boolean{
+            if(t==null||t.length<3)return false
+            val l=t.lowercase();if(junk.any{it in l})return false
+            val a=l.filter{it.isLetterOrDigit()};val b=station.lowercase().filter{it.isLetterOrDigit()}
+            return a.isNotEmpty()&&!b.contains(a)&&(b.isEmpty()||!a.contains(b.take(8)))
         }
         @JvmStatic fun playIntent(c:Context,id:String)=Intent(c,RadioService::class.java).setAction(PLAY).putExtra("id",id)
         @JvmStatic fun pauseIntent(c:Context)=Intent(c,RadioService::class.java).setAction(PAUSE)
@@ -50,6 +72,29 @@ class RadioService : Service() {
     private var prepared = false
     private var resumeAfterFocus = false
     private var round = 0
+    private var song = ""
+    private var titleMisses = 0
+    private val io = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private val titleTick = object:Runnable{override fun run(){
+        if(phase!="playing"&&phase!="loading")return
+        handler.postDelayed(this,30000)
+        if(phase!="playing"||titleMisses>=3)return
+        val u=urls.getOrNull(index)?:return;val sid=id;val st=name
+        try{io.execute{val t=fetchTitle(u);handler.post{applyTitle(sid,st,t)}}}catch(_:RuntimeException){}
+    }}
+    private fun applyTitle(sid:String,st:String,t:String?){
+        if(sid!=id)return
+        if(!usefulTitle(t,st)){titleMisses++;if(titleMisses>=3&&song.isNotEmpty()){song="";publish(phase,message)};return}
+        titleMisses=0
+        if(t!=song){song=t!!;session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,song).build());publish(phase,message)}
+    }
+    private fun markDown(on:Boolean){
+        if(id.isEmpty())return
+        val p=getSharedPreferences("radio",MODE_PRIVATE);val m=Health.read(p)
+        val before=m[id]?:0
+        if(on)m[id]=maxOf(before,1) else m.remove(id)
+        if((m[id]?:0)!=before)Health.write(p,m)
+    }
     private var retry: Runnable? = null
     private val delays = longArrayOf(2000,4000,8000,15000,30000)
     private val network = object: ConnectivityManager.NetworkCallback(){
@@ -95,7 +140,8 @@ class RadioService : Service() {
     private fun begin(stationId:String?){
         releasePlayer();resumeAfterFocus=false
         if(stationId==null||!loadStation(stationId)){stopPlayback("error","Emisora no disponible");return}
-        index=0;round=0
+        index=0;round=0;song="";titleMisses=0
+        handler.removeCallbacks(titleTick);handler.postDelayed(titleTick,4000)
         session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,"Radio Rocky 35").build())
         publish("loading","Conectando…")
         ensureForeground()
@@ -111,7 +157,7 @@ class RadioService : Service() {
         try{
             p.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
             p.setWakeMode(this,PowerManager.PARTIAL_WAKE_LOCK)
-            p.setOnPreparedListener{mp->if(player===mp){clearTimeout();try{mp.start();prepared=true;round=0;publish("playing","En vivo")}catch(e:RuntimeException){fail(mp)}}}
+            p.setOnPreparedListener{mp->if(player===mp){clearTimeout();try{mp.start();prepared=true;round=0;markDown(false);publish("playing","En vivo")}catch(e:RuntimeException){fail(mp)}}}
             p.setOnErrorListener{mp,_,_->fail(mp);true}
             p.setOnCompletionListener{fail(it)}
             p.setOnInfoListener{mp,what,_->
@@ -129,7 +175,7 @@ class RadioService : Service() {
         index++
         if(index<urls.size){connect();return}
         releasePlayer();index=0
-        if(round>=delays.size){stopPlayback("error","No se pudo conectar");return}
+        if(round>=delays.size){markDown(true);stopPlayback("error","No se pudo conectar");return}
         val wait=delays[round++]
         publish("loading","Reconectando… intento $round de ${delays.size}")
         val r=Runnable{retry=null;connect()};retry=r;handler.postDelayed(r,wait)
@@ -172,7 +218,7 @@ class RadioService : Service() {
         stopSelf()
     }
     private fun publish(p:String,text:String){
-        phase=p;message=text;emit(Snapshot(id,name,p,text))
+        phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f).build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
@@ -186,7 +232,7 @@ class RadioService : Service() {
         val stop=Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
         return Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
             .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
-            .setContentTitle(name).setContentText(message).addAction(main).addAction(stop)
+            .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else message).addAction(main).addAction(stop)
             .setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0,1)).build()
     }
     override fun onBind(intent:Intent?):IBinder?=null
@@ -194,6 +240,7 @@ class RadioService : Service() {
         try{getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(network)}catch(_:RuntimeException){}
         unregisterReceiver(noisy);releasePlayer();if(focus)audio.abandonAudioFocusRequest(focusRequest)
         if(phase=="playing"||phase=="loading")publish("paused","En pausa")
+        handler.removeCallbacks(titleTick);io.shutdownNow()
         session.release();super.onDestroy()
     }
 }
