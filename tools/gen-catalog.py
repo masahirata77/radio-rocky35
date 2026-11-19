@@ -5,7 +5,7 @@ os.chdir(os.path.join(os.path.dirname(__file__),'..'))
 def norm(s): return ''.join(c for c in unicodedata.normalize('NFD',s) if not unicodedata.combining(c)).lower()
 def k(s): return json.dumps(s,ensure_ascii=False).replace('$','\\$')
 arr=json.load(open('stations.json'))
-ids,names,depts,keys,urls,quals=[],[],[],[],[],[]
+ids,names,depts,keys,urls,quals,pops=[],[],[],[],[],[],[]
 dset=set();unknown=False
 for s in arr:
     d=s.get('department') or ''
@@ -17,6 +17,7 @@ for s in arr:
     ids.append(s['id']);names.append(s['name']);depts.append(d)
     c=(s.get('codec') or '').upper().replace('UNKNOWN','');br=int(s.get('bitrate') or 0)
     quals.append(f'{c} · {br} kbps' if c and br else f'{br} kbps' if br else c or 'Calidad desconocida')
+    pops.append(int(s.get('popularity') or 0))
     keys.append(norm(f"{s['name']} {d} {s.get('tags') or ''}"));urls.append(us)
 dl=['']+sorted(dset,key=norm)+(['unknown'] if unknown else [])
 L=lambda xs:'arrayOf('+','.join(k(x) for x in xs)+')'
@@ -31,6 +32,7 @@ object Catalog {{
     private val depts={L(depts)}
     private val keys={L(keys)}
     private val quals={L(quals)}
+    private val pops=intArrayOf({','.join(map(str,pops))})
     private val urls=arrayOf({','.join(L(u) for u in urls)})
     private val marks=Regex("\\\\p{{Mn}}+")
     private fun normalize(s:String)=marks.replace(Normalizer.normalize(s,Normalizer.Form.NFD),"").lowercase()
@@ -46,6 +48,9 @@ object Catalog {{
     fun id(i:Int)=ids[i]
     fun name(i:Int)=names[i]
     fun quality(i:Int)=quals[i]
+    fun popularity(i:Int)=pops[i]
+    private val coll=java.text.Collator.getInstance(java.util.Locale("es")).apply{{strength=java.text.Collator.PRIMARY}}
+    fun compareNames(a:Int,b:Int)=coll.compare(names[a],names[b])
     fun qualityOf(id:String)=byId[id]?.let{{quals[it]}}?:""
     fun row(index:Int):Array<String> = if(index in ids.indices) arrayOf(ids[index],names[index],depts[index]) else emptyArray()
     fun station(id:String):Array<String>{{val i=byId[id]?:-1;return if(i<0) emptyArray() else arrayOf(names[i])+urls[i]}}

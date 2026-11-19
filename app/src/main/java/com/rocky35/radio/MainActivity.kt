@@ -56,6 +56,30 @@ class MainActivity : Activity() {
     private var changing = false
     private var draggingVolume = false
     private val prefs by lazy { getSharedPreferences("radio", MODE_PRIVATE) }
+    private val sortNames=arrayOf("Nombre","Popularidad","Últimas escuchadas","Más escuchadas")
+    private var sortMode=0
+    private var sortReverse=false
+    private lateinit var sortBtn: Button
+    private lateinit var dirBtn: Button
+    private val plays=HashMap<String,LongArray>()
+    private fun loadPlays(){try{val o=JSONObject(prefs.getString("plays","{}")?:"{}");for(k in o.keys()){val a=o.getJSONArray(k);plays[k]=longArrayOf(a.getLong(0),a.getLong(1))}}catch(_:Exception){}}
+    private fun savePlay(id:String){
+        val a=plays.getOrPut(id){longArrayOf(0,0)};a[0]++;a[1]=System.currentTimeMillis()
+        val o=JSONObject();for((k,v) in plays)o.put(k,JSONArray().put(v[0]).put(v[1]))
+        prefs.edit().putString("plays",o.toString()).apply()
+    }
+    private fun sortRows(r:IntArray):IntArray{
+        val c:Comparator<Int> = when(sortMode){
+            1->compareByDescending<Int>{Catalog.popularity(it)}
+            2->compareByDescending<Int>{plays[Catalog.id(it)]?.get(1)?:0L}
+            3->compareByDescending<Int>{plays[Catalog.id(it)]?.get(0)?:0L}
+            else->Comparator{a,b->Catalog.compareNames(a,b)}
+        }
+        val tie=Comparator<Int>{a,b->Catalog.compareNames(a,b)}
+        val full=c.then(tie)
+        return r.sortedWith(if(sortReverse)full.reversed() else full).toIntArray()
+    }
+    private fun updateSortButtons(){sortBtn.text="⇅ "+sortNames[sortMode];dirBtn.text=if(sortReverse)"↑" else "↓"}
     private val playbackObserver: (RadioService.Companion.Snapshot)->Unit = { syncPlayback(it) }
     private val volumeObserver = object:ContentObserver(handler){
         override fun onChange(selfChange:Boolean){syncVolume()}
@@ -117,9 +141,15 @@ class MainActivity : Activity() {
         val names=departments.map { when(it){""->"Todos los departamentos";"unknown"->"Sin departamento confirmado";else->it} }
         region.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_item,names).apply {setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)}
         root.addFull(region,46,8)
-        val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,9)
+        val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,6)
+        sortMode=prefs.getInt("sortMode",0).coerceIn(0,3);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
+        val sorts=row();sortBtn=button("",fg).apply{background=shape(panel,12,line);contentDescription="Cambiar orden"};dirBtn=button("",fg).apply{background=shape(panel,12,line);textSize=18f;contentDescription="Invertir orden"}
+        sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));root.addFull(sorts,40,9)
+        sortBtn.setOnClickListener{sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
+        dirBtn.setOnClickListener{sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
+        updateSortButtons()
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
-        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_OVERLAY}
+        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET;setPadding(0,0,dp(14),0);clipToPadding=false}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
@@ -151,6 +181,7 @@ class MainActivity : Activity() {
     private fun refresh(){
         if(!::adapter.isInitialized||detached)return
         rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
+        rows=sortRows(rows)
         down=Health.read(prefs)
         if(down.isNotEmpty()){
             val r=rows;val a=IntArray(r.size);var n=0
@@ -168,7 +199,7 @@ class MainActivity : Activity() {
     private fun playing()=phase=="playing"||phase=="loading"
     private fun listen(id:String){
         if(id==selected && playing()){startService(RadioService.pauseIntent(this));phase="paused"}
-        else {selected=id;phase="loading";val station=Catalog.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
+        else {selected=id;phase="loading";savePlay(id);val station=Catalog.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
         updatePlayer();adapter.notifyDataSetChanged()
     }
     private fun updatePlayer(){

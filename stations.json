@@ -9,7 +9,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://carvedeportiva.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 333
   },
   {
     "id": "f1b99f20-97cf-410a-8167-2378742a83a7",
@@ -28,7 +29,8 @@
       "https://azul-2.nty.uy/",
       "https://azul-1.nty.uy/"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 797
   },
   {
     "id": "36548502-58b5-49d4-a57a-2f1c0d7ed43b",
@@ -40,7 +42,8 @@
     "codec": "MP3",
     "bitrate": 24,
     "website": "https://noventatres.com/",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 98
   },
   {
     "id": "962310ce-0601-11e8-ae97-52543be04c81",
@@ -59,7 +62,8 @@
       "http://radio.dl.uy:9950/radio",
       "https://delsol-1.nty.uy/?type=http&nocache=2780&dbl=0"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 26435
   },
   {
     "id": "ee04add0-4028-49ca-b59d-57a74e5e4a77",
@@ -78,7 +82,8 @@
       "https://comodin.uy/radio/8000/320.mp3",
       "https://comodin.uy/radio/8000/128.mp3"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 5905
   },
   {
     "id": "8b241605-fac7-4e1f-b19b-d85ffa573733",
@@ -90,7 +95,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://970universal.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 1603
   },
   {
     "id": "92b09dc8-3f1b-4575-b2b4-dd8343b86dcd",
@@ -111,7 +117,8 @@
       "https://oceano-2.nty.uy/",
       "https://oceano-2.nty.uy/netradio/listen.mp3:8000/;?download=false"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 820
   },
   {
     "id": "4dc3cedb-ff17-46ce-86d6-65f874532d5c",
@@ -123,7 +130,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://www.sarandi690.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 1614
   },
   {
     "id": "130a1d84-3350-494a-b27c-4d8ac3b8e77c",
@@ -135,7 +143,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radiomontecarlo.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 818
   },
   {
     "id": "7f93746d-a548-40a3-9ea0-e366174038c4",
@@ -154,7 +163,8 @@
       "https://inolvidable-2.nty.uy/",
       "https://inolvidable-1.nty.uy/"
     ],
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 848
   },
   {
     "id": "64297026-ae46-457b-88e8-70a210421465",
@@ -166,7 +176,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://espectador.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 215
   },
   {
     "id": "1ef716e8-8d6e-4067-979b-68a28e4f0536",
@@ -178,7 +189,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.915espaciofm.com/",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 76
   },
   {
     "id": "3ed0c8a0-30fa-4260-bc6b-133f91cccadc",
@@ -190,7 +202,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://fmcolumbia.com/",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 1275
   },
   {
     "id": "7f22bc88-e4e1-46b6-ab63-efca9067fcda",
@@ -202,7 +215,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://www.latinafm.com.uy/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 462
   },
   {
     "id": "51a267e2-7fe4-480c-8500-50795f7d86a3",
@@ -214,7 +228,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "https://radiouruguay.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 3402
   },
   {
     "id": "55146c47-acf2-45e8-880e-ba9af4e8bf4b",
@@ -226,7 +241,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radio.ladiaria.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 91
   },
   {
     "id": "fca906fe-988c-4bdf-b48d-3ab10ed86f02",
@@ -238,7 +254,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://alfafm.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 413
   },
   {
     "id": "6c9ab68e-edd4-43f6-9ac1-a6f41826a4b7",
@@ -250,7 +267,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://24deagosto.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 637
   },
   {
     "id": "dfa4f419-1eb4-4b87-ad65-cacec11b98aa",
@@ -262,7 +280,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://www.radiofutura.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 46
   },
   {
     "id": "2571cb2c-ef3c-4c9b-b475-ff308df9d29f",
@@ -274,7 +293,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://cosquinrockuy.net/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 143
   },
   {
     "id": "ce48e0e0-6878-4d4b-b3d6-f070b98ccf7f",
@@ -286,7 +306,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 508
   },
   {
     "id": "a90f4ea6-3b32-42f2-9934-1a7e24dbf744",
@@ -298,7 +319,8 @@
     "codec": "AAC+",
     "bitrate": 320,
     "website": "https://www.radioneutralfm.com/",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 11
   },
   {
     "id": "bdb9ac65-d8b9-4900-ae9f-4bb9a726a664",
@@ -310,7 +332,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "http://www.laserfm.com.uy/",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 635
   },
   {
     "id": "e52d66f7-9b0d-44b5-ad37-6632e14249bf",
@@ -329,7 +352,8 @@
       "https://playerservices.streamtheworld.com/api/livestream-redirect/DISNEY_URY_MVAAC.aac",
       "https://27383.live.streamtheworld.com/DISNEY_URY_MV.mp3"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 135
   },
   {
     "id": "59f0d41a-0583-4fe4-ad48-249af3ea1789",
@@ -341,7 +365,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://enperspectiva.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 381
   },
   {
     "id": "8ba8a34b-ec02-4463-b5f8-7400ed48e6c4",
@@ -353,7 +378,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.celestialfm.com/sitio/",
-    "department": null
+    "department": null,
+    "popularity": 166
   },
   {
     "id": "589a80ab-553d-4806-98ac-1e22009ab87b",
@@ -365,7 +391,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://zeno.fm/lanuevadelsur",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 300
   },
   {
     "id": "6f1973f7-a271-421e-86de-5b1afe7a7b01",
@@ -377,7 +404,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radiocarve.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 106
   },
   {
     "id": "b75a0314-252b-4c18-b782-39f7ff321cb9",
@@ -389,7 +417,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://zeno.fm/radio/galaxiafm1059/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 22
   },
   {
     "id": "c1fcf486-32a4-483d-b320-b18e8f0a93ce",
@@ -401,7 +430,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://fmhit.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 272
   },
   {
     "id": "1c4580fd-2784-46a4-aa76-dc66346d9919",
@@ -413,7 +443,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://mediospublicos.uy/category/radio/radio-babel/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 21
   },
   {
     "id": "f37db6c4-485b-49f2-818c-2bcc8376868f",
@@ -425,7 +456,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "http://radioconaicop.blogspot.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 250
   },
   {
     "id": "0389cd54-bf1b-4e3b-b0c3-98309eb9fa34",
@@ -437,7 +469,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "https://radioelaguantadero.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 11
   },
   {
     "id": "49777892-8a22-4806-b509-d3d2d0f7edb1",
@@ -449,7 +482,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://www.radio41.com.uy/",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 76
   },
   {
     "id": "7384f164-b739-44b3-8533-24efc7c2c8c8",
@@ -461,7 +495,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radiofm991.com/",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 75
   },
   {
     "id": "903dd94b-5fa7-41b5-9d6a-21e144b98786",
@@ -473,7 +508,8 @@
     "codec": "MP3",
     "bitrate": 320,
     "website": "https://federalfm.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 230
   },
   {
     "id": "6fbd5b7d-5350-423d-bd3c-d7a9d64e5c56",
@@ -485,7 +521,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.unorte.edu.uy/radio.html",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 5
   },
   {
     "id": "a761dfd0-e639-42f8-872e-45a3ffb1dee1",
@@ -497,7 +534,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.uniradio.edu.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 16
   },
   {
     "id": "02c73aae-897a-4fb6-bddc-9cd65c50ad49",
@@ -509,7 +547,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://emisorastacuarembo.com/radio/",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 76
   },
   {
     "id": "ed1466fc-9791-4f4c-aebf-fe89cff61dfd",
@@ -521,7 +560,8 @@
     "codec": "AAC+",
     "bitrate": 128,
     "website": "https://perfilfm.com/",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 130
   },
   {
     "id": "7edc2b2a-656f-409b-bf88-7328ebb67a9d",
@@ -533,7 +573,8 @@
     "codec": "MP3",
     "bitrate": 48,
     "website": "https://radiorural.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 660
   },
   {
     "id": "944fc098-5e6c-47f3-9109-b2390ac3bc9b",
@@ -552,7 +593,8 @@
       "http://medios.ciudaddigital.com.uy:8042/Felicidad",
       "https://medios.ciudaddigital.com.uy:18042/Felicidad"
     ],
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 410
   },
   {
     "id": "e0975f90-85bf-4fe9-8d8f-fcc11305fffa",
@@ -564,7 +606,8 @@
     "codec": "AAC+",
     "bitrate": 32,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 994
   },
   {
     "id": "802723bb-8cf7-4641-a810-fbcc8d20da75",
@@ -576,7 +619,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://www.airefm.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 53
   },
   {
     "id": "9fe98180-3855-4f43-963c-855fa02eeaae",
@@ -588,7 +632,8 @@
     "codec": "AAC+",
     "bitrate": 48,
     "website": "https://radiolazurda.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 455
   },
   {
     "id": "4df982e0-a83e-403e-98ae-709302848de1",
@@ -600,7 +645,8 @@
     "codec": "AAC+",
     "bitrate": 32,
     "website": "https://caucesfm.uy/",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 55
   },
   {
     "id": "285d89a3-9f3b-457e-98b6-c91693b71d90",
@@ -612,7 +658,8 @@
     "codec": "AAC+",
     "bitrate": 64,
     "website": "https://www.radiocontinental.com.uy/",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 271
   },
   {
     "id": "74bb61ea-570f-41de-b588-0a2b8ac60ee8",
@@ -624,7 +671,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://megafm.com.uy/mega/",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 147
   },
   {
     "id": "63fc568e-825a-4873-bb3b-e10d29531df5",
@@ -636,7 +684,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "https://radiofenix.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 155
   },
   {
     "id": "6184a45e-3156-4e23-9f60-d5622aa3db77",
@@ -648,7 +697,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://elpuenteportal.org.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 47
   },
   {
     "id": "e8db6f2a-b986-407c-af2c-70a756b852c3",
@@ -660,7 +710,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "https://clasica.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 1326
   },
   {
     "id": "915e77b1-9539-4363-9139-6b01f92c77d0",
@@ -672,7 +723,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://masfm.com.uy/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 10
   },
   {
     "id": "e9a0ea6f-ed0d-4091-8221-986249dc6d92",
@@ -691,7 +743,8 @@
       "http://salida.stream.com.uy:8506/stream",
       "https://salida.stream.com.uy:8506/stream"
     ],
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 335
   },
   {
     "id": "76367ae7-3ce3-470d-ad59-ed2a31640d31",
@@ -703,7 +756,8 @@
     "codec": "AAC+",
     "bitrate": 32,
     "website": "https://www.fmciudadela.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 80
   },
   {
     "id": "1facf1b9-7977-419d-8b95-202fa77eec62",
@@ -715,7 +769,8 @@
     "codec": "AAC+",
     "bitrate": 32,
     "website": "http://radiosancarlos.uy/",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 486
   },
   {
     "id": "9fe7190b-687b-40f2-bdfc-51530c57f0b2",
@@ -727,7 +782,8 @@
     "codec": "AAC+",
     "bitrate": 128,
     "website": "",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 2135
   },
   {
     "id": "d7c7b10a-c736-479f-bdb4-eb3936879a75",
@@ -739,7 +795,8 @@
     "codec": "AAC",
     "bitrate": 80,
     "website": "https://horizonte1063.com.uy/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 256
   },
   {
     "id": "fba9c6de-ee84-4db7-ab12-c97ed5347789",
@@ -751,7 +808,8 @@
     "codec": "AAC+",
     "bitrate": 72,
     "website": "https://atlantidafm.com.uy/",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 536
   },
   {
     "id": "06e2a1c6-be97-448f-98e7-435e4834ce27",
@@ -763,7 +821,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radioactivaflorida.com/",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 91
   },
   {
     "id": "945780f5-b760-4e9e-8cae-fed86cd97af5",
@@ -775,7 +834,8 @@
     "codec": "MP3",
     "bitrate": 40,
     "website": "https://ellibertador.com.uy/",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 146
   },
   {
     "id": "b05b1cd3-4438-469f-a1d8-49152b03b5cf",
@@ -787,7 +847,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://www.lacostafm88.com/",
-    "department": null
+    "department": null,
+    "popularity": 27
   },
   {
     "id": "3e10abc4-3128-4e38-b78f-1ef984e19015",
@@ -799,7 +860,8 @@
     "codec": "AAC+",
     "bitrate": 96,
     "website": "https://radioclarin.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 396
   },
   {
     "id": "15be12be-59a4-4919-8b50-e14c94ed9e66",
@@ -811,7 +873,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.diamantefm.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 76
   },
   {
     "id": "f9fa2179-649e-4ded-99c9-4e4687f51361",
@@ -823,7 +886,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radiocasupa941.webnode.com.uy/",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 25
   },
   {
     "id": "9834a837-d0e0-4052-a43c-49e6f5883979",
@@ -835,7 +899,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://fmcordialidad.com/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 60
   },
   {
     "id": "d12b12ce-3e7e-466b-b626-4361c489d3cb",
@@ -847,7 +912,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "https://mediospublicos.uy/category/radio/radio-cultura/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 397
   },
   {
     "id": "aa807a7e-3804-433a-88ab-5853db531490",
@@ -859,7 +925,8 @@
     "codec": "AAC+",
     "bitrate": 32,
     "website": "https://fmlaley.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 261
   },
   {
     "id": "25abad2d-4125-4a87-b9ae-b2c63581e322",
@@ -871,7 +938,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "https://fmdigital.net/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 101
   },
   {
     "id": "9b8f7b58-c07b-4be4-a1dd-83fea0a75cd3",
@@ -883,7 +951,8 @@
     "codec": "AAC+",
     "bitrate": 96,
     "website": "https://fmbuenosaires.net/",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 80
   },
   {
     "id": "892427cc-ee5a-499b-98e3-145cf93d02b8",
@@ -895,7 +964,8 @@
     "codec": "MP3",
     "bitrate": 213,
     "website": "https://radioandres.mooo.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 2
   },
   {
     "id": "710eda9f-7b90-4f91-a414-6edb9ae9b422",
@@ -907,7 +977,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.diasdegloria.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 60
   },
   {
     "id": "e503a730-cf8c-43ec-9eec-da5692fe9896",
@@ -919,7 +990,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://fmcoronilla.uy/",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 647
   },
   {
     "id": "f17ab61c-bdeb-461e-873b-3edff12a65e9",
@@ -931,7 +1003,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "http://www.fmdelcarmen.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 25
   },
   {
     "id": "e77b3308-dcc1-48b3-8991-ea10a227a360",
@@ -943,7 +1016,8 @@
     "codec": "MP3",
     "bitrate": 32,
     "website": "https://www.radioriobranco.com.uy/",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 111
   },
   {
     "id": "9c52b881-e2a8-4e0f-b628-218693d3f002",
@@ -955,7 +1029,8 @@
     "codec": "AAC+",
     "bitrate": 48,
     "website": "https://fmnaturaleza.com/",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 1275
   },
   {
     "id": "d465188b-0b53-4b81-9f43-a9a05210fba4",
@@ -967,7 +1042,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://la-clave-92-9-fm.webnode.es/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 111
   },
   {
     "id": "4632db98-adcb-4e3a-9e8c-a887cee1554c",
@@ -979,7 +1055,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 266
   },
   {
     "id": "b4c30098-72cd-407a-90bc-60750811c426",
@@ -991,7 +1068,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.cx46.com.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 486
   },
   {
     "id": "27b1bae3-17fb-4fbf-a2e3-a714bdcae203",
@@ -1003,7 +1081,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "https://fmcaraguatalavoz.com/",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "4d8e230e-2fcc-4332-8310-db7052859ebb",
@@ -1015,7 +1094,8 @@
     "codec": "AAC+",
     "bitrate": 48,
     "website": "https://laotrafmpaysandu.blogspot.com/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 455
   },
   {
     "id": "0b61338e-2a44-4a0f-8833-f32f994b438d",
@@ -1034,7 +1114,8 @@
       "https://comodin.uy/listen/chiveo/320.mp3",
       "https://comodin.uy/listen/chiveo/128.mp3"
     ],
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 216
   },
   {
     "id": "b58eb7ad-0076-46c7-9e32-643aac0a7801",
@@ -1046,7 +1127,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "http://mundofm.net/",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 245
   },
   {
     "id": "6c514f49-f736-11e9-bbf2-52543be04c81",
@@ -1058,7 +1140,8 @@
     "codec": "AAC+",
     "bitrate": 112,
     "website": "http://www.radiorivera.com.uy/",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 1111
   },
   {
     "id": "4122a7e8-0843-429e-89da-03170248f4d4",
@@ -1070,7 +1153,8 @@
     "codec": "AAC",
     "bitrate": 192,
     "website": "https://radiosenialesfm.com/index.html",
-    "department": null
+    "department": null,
+    "popularity": 41
   },
   {
     "id": "3e656ae3-b36e-4ba4-89bc-99f306df1de5",
@@ -1082,7 +1166,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://oriental.com.uy/inicio/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 5270
   },
   {
     "id": "c0877115-5b48-4aff-82cd-e6e416f3467b",
@@ -1094,7 +1179,8 @@
     "codec": "AAC+",
     "bitrate": 64,
     "website": "https://radios.com.uy/difusora-treinta-y-tres/",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 70
   },
   {
     "id": "802161cd-f014-4e67-9a54-743b396726c5",
@@ -1106,7 +1192,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://www.radiomasfm.com/",
-    "department": null
+    "department": null,
+    "popularity": 41
   },
   {
     "id": "a974b0af-bd2b-4437-a0c6-e5c7fafa1111",
@@ -1118,7 +1205,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.labottegaonline.com/radio/index.html",
-    "department": null
+    "department": null,
+    "popularity": 5
   },
   {
     "id": "95daaff5-5803-4662-af59-2df2e486d848",
@@ -1130,7 +1218,8 @@
     "codec": "AAC+",
     "bitrate": 64,
     "website": "http://radiounofm.com.uy/",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 1565
   },
   {
     "id": "1b39a6a6-fd5a-4d87-9a6a-33e28ab0e088",
@@ -1142,7 +1231,8 @@
     "codec": "MP3",
     "bitrate": 256,
     "website": "https://www.radiokairos.net/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 546
   },
   {
     "id": "a2d6019a-f5f9-43f2-bcc5-eaab3e1347fa",
@@ -1154,7 +1244,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radiopatria.com.uy/",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 101
   },
   {
     "id": "d63a3754-792d-4513-8005-bc2396878b11",
@@ -1166,7 +1257,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "http://cx10continente.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 130
   },
   {
     "id": "cd51354d-f357-4ad0-a499-910d4cef28bf",
@@ -1178,7 +1270,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radiocero.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 116
   },
   {
     "id": "b65915bf-7400-4c6e-9972-f18f7d6f71e5",
@@ -1190,7 +1283,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://multimediosrincon.com.uy/",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 86
   },
   {
     "id": "f49b28f9-c102-4bca-b388-8d96922a8926",
@@ -1202,7 +1296,8 @@
     "codec": "MP3",
     "bitrate": 56,
     "website": "https://amatistafm.com/",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 52
   },
   {
     "id": "de763e10-21ee-428c-a7d8-ed1697e155f6",
@@ -1214,7 +1309,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radiocw39.com/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 335
   },
   {
     "id": "d692ca37-13d7-4cda-8239-91a1212b5884",
@@ -1226,7 +1322,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://onlineradiobox.com/uy/acuarela/",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 110
   },
   {
     "id": "52d65ca3-99b6-11e9-a605-52543be04c81",
@@ -1238,7 +1335,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "http://americafm.com.uy/",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 1450
   },
   {
     "id": "d6ddfa9c-9466-4fdf-aeca-e178dd82f375",
@@ -1250,7 +1348,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://contactofm.com.uy/",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 335
   },
   {
     "id": "a726dad0-64d5-4530-a677-4988143d74bb",
@@ -1262,7 +1361,8 @@
     "codec": "MP3",
     "bitrate": 320,
     "website": "https://www.cw54emisoradeleste.com.uy/",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 6
   },
   {
     "id": "37ff12d8-ae3b-43fb-8715-392369808d21",
@@ -1274,7 +1374,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.lavozdemelo.com.uy/",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 250
   },
   {
     "id": "ebf3d864-bf40-4abc-b4d9-110e95271050",
@@ -1286,7 +1387,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radiopradosur.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 116
   },
   {
     "id": "332b5af3-003a-48e6-8497-9b6ae1392adc",
@@ -1298,7 +1400,8 @@
     "codec": "OGG",
     "bitrate": 192,
     "website": "https://fm1067.com.uy/",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "d9e79c5e-c9da-4a3d-808b-926d62e5536d",
@@ -1310,7 +1413,8 @@
     "codec": "AAC+",
     "bitrate": 64,
     "website": "https://bolicheradio.com/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 501
   },
   {
     "id": "c1265edc-5a90-11e9-a622-52543be04c81",
@@ -1322,7 +1426,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "https://www.radiomaria.org.uy/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 1465
   },
   {
     "id": "8b6636f7-bcea-4cf9-9f20-cc7fbb85a947",
@@ -1334,7 +1439,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://emisoraprincipal.com/",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 67
   },
   {
     "id": "3abdcdee-4173-49af-85f7-93eb4bca5951",
@@ -1346,7 +1452,8 @@
     "codec": "AAC+",
     "bitrate": 48,
     "website": "https://www.radiocarmelo.com/",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 610
   },
   {
     "id": "a369d9a1-5f08-413a-8b22-631383f7de6a",
@@ -1358,7 +1465,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://www.radionacional.com.uy/web/",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 35
   },
   {
     "id": "60d6612c-19c8-4a4b-a5b7-8e45d1b4d9f7",
@@ -1370,7 +1478,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://impacto989.com.uy/",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 126
   },
   {
     "id": "cbd65b85-26cf-43e8-8c28-40313786596f",
@@ -1382,7 +1491,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radio098.wixsite.com/radio098",
-    "department": null
+    "department": null,
+    "popularity": 40
   },
   {
     "id": "b869e3e7-b75b-4ac8-9d58-763a2f3605e6",
@@ -1394,7 +1504,8 @@
     "codec": "AAC+",
     "bitrate": 64,
     "website": "https://deltafm.com.uy/sitio/",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 536
   },
   {
     "id": "d2d0a641-a1d8-4ba9-9c37-4c52a14a0c1a",
@@ -1406,7 +1517,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://multimediosrincon.com.uy/",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 80
   },
   {
     "id": "5f663a9d-5fd5-4a87-ad42-ce839c222fd0",
@@ -1418,7 +1530,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://10minutos.com.uy/arapeyon-line/",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 135
   },
   {
     "id": "79313594-2bf2-5253-a9c0-3ea2544e5f28",
@@ -1430,7 +1543,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "e3cc7884-faa5-50ba-8fdb-24bdc419ea64",
@@ -1442,7 +1556,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "3dff920c-160c-526a-9d96-75f14050b17b",
@@ -1454,7 +1569,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "e3d98e1d-1e56-59ee-8c0b-5983e554fc30",
@@ -1466,7 +1582,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "30634cae-5f53-53a3-9e3a-8c2cff25988b",
@@ -1478,7 +1595,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "3cfdf459-7df5-5b11-b2b7-0197581c5f23",
@@ -1490,7 +1608,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "be2f10b1-370e-58e5-b1b5-beb1326bad57",
@@ -1502,7 +1621,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "d7cccfcc-354a-58c2-a6af-5d330f7739c1",
@@ -1514,7 +1634,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 0
   },
   {
     "id": "5b6b028a-6eaf-5f8f-bca9-a2ecd92f6d7b",
@@ -1526,7 +1647,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "9bfa812f-cb2f-57cd-8773-6e9936f901d4",
@@ -1542,7 +1664,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "66bc06b1-c339-5366-ad12-cf564d65188d",
@@ -1554,7 +1677,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "985e5eaa-d46c-5e57-8115-5ebbd78d3cf8",
@@ -1566,7 +1690,8 @@
     "codec": "AAC",
     "bitrate": 256,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "be2f10b1-370e-58e5-b1b5-beb1326bad57",
@@ -1578,7 +1703,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "63183a3f-93ba-506d-94a7-cedef2daad66",
@@ -1594,7 +1720,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "",
-    "department": "Flores"
+    "department": "Flores",
+    "popularity": 0
   },
   {
     "id": "805d61e8-c4a9-5280-95fd-c6153a368bd3",
@@ -1606,7 +1733,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://emisoralibertad.uy/",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 0
   },
   {
     "id": "ced4b355-124e-5802-97d1-7f958826f0db",
@@ -1618,7 +1746,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "610f2c2b-0eae-535c-a6a7-9a29323f3bff",
@@ -1630,7 +1759,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "a82d85da-4f50-5347-b6ce-a2a98d103219",
@@ -1646,7 +1776,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "96376b14-0375-52cb-8276-50520c3edb75",
@@ -1658,7 +1789,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "7b720cbe-cd7b-59d7-b8ab-c76dc9399db5",
@@ -1670,7 +1802,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "c305245e-eb82-53d0-b1cc-e8183329ec19",
@@ -1682,7 +1815,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "ac588b47-29f4-58a4-abee-733bac951039",
@@ -1694,7 +1828,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "cccaab0f-b8fa-57a8-828b-6ef089c8d1e0",
@@ -1706,7 +1841,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Lavalleja"
+    "department": "Lavalleja",
+    "popularity": 0
   },
   {
     "id": "e0378c8a-395c-5f4e-9796-1c54804fb02c",
@@ -1718,7 +1854,8 @@
     "codec": "AAC",
     "bitrate": 96,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "973faee4-b26a-5e44-8ef3-b14c10ab8456",
@@ -1730,7 +1867,8 @@
     "codec": "MP3",
     "bitrate": 56,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "638d4363-0ab0-5e0c-8b38-d523629ec14d",
@@ -1742,7 +1880,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "68c62c4a-8219-5dd0-b0f7-d587d99a29aa",
@@ -1754,7 +1893,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 41
   },
   {
     "id": "99273f08-054a-5e6a-96fd-2f835c796536",
@@ -1766,7 +1906,8 @@
     "codec": "AAC",
     "bitrate": 112,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "65a9f6f5-a7de-591e-9d81-5ddb63e114e1",
@@ -1782,7 +1923,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 335
   },
   {
     "id": "337a4250-89d6-5c6e-9b40-2a90358a52d4",
@@ -1794,7 +1936,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "81e0cbae-ee97-5231-9036-28857f5e4ed3",
@@ -1806,7 +1949,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "a6afde0e-6959-5667-9538-f5f5eb22e6ba",
@@ -1818,7 +1962,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "c5b9e0f0-b27e-57b5-90a8-179cfec0705b",
@@ -1830,7 +1975,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "aa7db6da-a3ee-5f89-b982-9d69192ea33f",
@@ -1842,7 +1988,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "489f4c70-5609-5d57-aa19-040bde43a267",
@@ -1854,7 +2001,8 @@
     "codec": "AAC",
     "bitrate": 320,
     "website": "",
-    "department": "Durazno"
+    "department": "Durazno",
+    "popularity": 0
   },
   {
     "id": "151bfcc6-aa8e-5b71-9ae3-d9bf407750b9",
@@ -1866,7 +2014,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "28919938-be96-5e49-8a10-01225668e6a7",
@@ -1882,7 +2031,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "465d032a-9290-5896-9e78-277560201fb2",
@@ -1894,7 +2044,8 @@
     "codec": "AAC",
     "bitrate": 72,
     "website": "",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "b0fdbec8-a711-5fc7-ad98-cd30ad3fc265",
@@ -1906,7 +2057,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "286d2edd-6f1d-5879-9a05-dd900bf93d33",
@@ -1918,7 +2070,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "8909f9b4-e6c1-5c23-b65e-e2c40d23fd08",
@@ -1930,7 +2083,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "9db7f16e-b3f0-5acf-b487-6bbd2a4d3bbb",
@@ -1942,7 +2096,8 @@
     "codec": "MP3",
     "bitrate": 256,
     "website": "",
-    "department": "Lavalleja"
+    "department": "Lavalleja",
+    "popularity": 0
   },
   {
     "id": "e3ef6d76-4a29-5c6a-bbd0-cce0986e85c6",
@@ -1954,7 +2109,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "2cf4fc14-1e74-539d-9e69-addfdcdee7f5",
@@ -1966,7 +2122,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 0
   },
   {
     "id": "6b3b81b2-677b-5708-bf50-01b0e0d2391d",
@@ -1978,7 +2135,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": "Durazno"
+    "department": "Durazno",
+    "popularity": 0
   },
   {
     "id": "ba7934dd-67fc-5676-8459-bc2d3460feef",
@@ -1990,7 +2148,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "a381e810-95b4-591d-805a-6fd34046892f",
@@ -2006,7 +2165,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "cff1ff0c-3f9e-5de0-831f-8a7ff39a35e4",
@@ -2018,7 +2178,8 @@
     "codec": "AAC",
     "bitrate": 48,
     "website": "",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 0
   },
   {
     "id": "a73e0d6f-3df1-5307-bd44-b30a5bfd037c",
@@ -2030,7 +2191,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Durazno"
+    "department": "Durazno",
+    "popularity": 0
   },
   {
     "id": "12801f3a-6c65-5dad-8428-bc7127d215b2",
@@ -2042,7 +2204,8 @@
     "codec": "MP3",
     "bitrate": 64,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "abbf83e9-515a-5726-9aaa-b407ad15f1ce",
@@ -2054,7 +2217,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "06801c45-fdc7-5fe8-a285-9638a4d0cc4d",
@@ -2066,7 +2230,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "c17b23a5-2450-53f7-a891-f691acc63c7f",
@@ -2078,7 +2243,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "e06c3d5e-0b56-52e6-b11c-6380a1e8dc11",
@@ -2090,7 +2256,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "528d0162-f545-55f5-a221-4872077357d8",
@@ -2102,7 +2269,8 @@
     "codec": "MP3",
     "bitrate": 48,
     "website": "",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 0
   },
   {
     "id": "e411e98f-cbb6-591c-8b18-1e7d0eb6ae48",
@@ -2114,7 +2282,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 41
   },
   {
     "id": "14aae650-23c2-5758-81a3-e31eb2240e01",
@@ -2126,7 +2295,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "1f757bdf-5086-5d4b-9557-ace4820e9939",
@@ -2138,7 +2308,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Salto"
+    "department": "Salto",
+    "popularity": 0
   },
   {
     "id": "625191de-127a-5e41-b103-89e373ef2af0",
@@ -2150,7 +2321,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "592099c0-4160-548c-990b-8caebcf65770",
@@ -2162,7 +2334,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "eae0273b-3dcb-5ffc-ac8d-db3fd00314a9",
@@ -2174,7 +2347,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "ef0c87e5-86f6-58f4-b3b1-2299123e7495",
@@ -2186,7 +2360,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "ff62fa77-4172-5be6-8ca5-d1408a1f88f0",
@@ -2198,7 +2373,8 @@
     "codec": "MP3",
     "bitrate": 320,
     "website": "",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 536
   },
   {
     "id": "fad5537f-17b5-57a3-a44e-a60784ab91be",
@@ -2210,7 +2386,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "9352aa4b-b8f4-5374-9475-b11b05dce91c",
@@ -2222,7 +2399,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "16ca13ab-0345-55e6-a417-97a4f4cce295",
@@ -2234,7 +2412,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "3e068e2c-fc2d-5d99-8b8f-d9a9ec8734ed",
@@ -2246,7 +2425,8 @@
     "codec": "MP3",
     "bitrate": 48,
     "website": "",
-    "department": "Durazno"
+    "department": "Durazno",
+    "popularity": 0
   },
   {
     "id": "c854ba61-74be-5c96-8f1f-b14346839d7e",
@@ -2258,7 +2438,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "09f406f5-c0d4-563e-830b-5a5a992a3cef",
@@ -2270,7 +2451,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "6afeac72-6705-5be9-a977-27bc6ed5aed2",
@@ -2282,7 +2464,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "c6f09e56-51fa-57d0-b94d-3ed0be9b756b",
@@ -2294,7 +2477,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "e12c6e27-81b4-5e02-ab10-d18c48ea87bd",
@@ -2306,7 +2490,8 @@
     "codec": "AAC",
     "bitrate": 192,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "5f23b6ad-58f1-57d7-812a-25f0b5a65eab",
@@ -2318,7 +2503,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "01fa2602-b771-5a3f-aa14-f087db992745",
@@ -2330,7 +2516,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "6e6bfee2-a7ff-5722-a9c9-56cf52c78e40",
@@ -2342,7 +2529,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "b9d68a8b-21d3-585a-acfd-efc3c8631d45",
@@ -2354,7 +2542,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "5139c36b-1a6b-5369-af15-7667ae7f29ff",
@@ -2366,7 +2555,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "a4568218-3b1b-566b-bfec-a6bf7e05945d",
@@ -2378,7 +2568,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Artigas"
+    "department": "Artigas",
+    "popularity": 0
   },
   {
     "id": "ec5f4e7b-4dd7-5bee-b418-3e2f23df3937",
@@ -2390,7 +2581,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Lavalleja"
+    "department": "Lavalleja",
+    "popularity": 0
   },
   {
     "id": "50d431cd-bda8-58e4-960b-2d987cad927c",
@@ -2402,7 +2594,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "a32a4c0f-3f58-58f5-8cd0-3b0271014559",
@@ -2414,7 +2607,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "12e782b6-9d65-5c86-87df-c50d4c1fb64e",
@@ -2426,7 +2620,8 @@
     "codec": "AAC",
     "bitrate": 320,
     "website": "",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "6fba3cbe-62f0-586c-80f8-d5d6448f3bce",
@@ -2438,7 +2633,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/cadena-del-mar",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "f37c7a03-ef17-5fb0-852a-c87e1121c96f",
@@ -2450,7 +2646,8 @@
     "codec": "MP3",
     "bitrate": 256,
     "website": "https://radios-online-uruguay.com/concierto-fm",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "f1c3bf4b-7ab5-5f31-b6e3-cafa5879c661",
@@ -2462,7 +2659,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/canto-y-fogon",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "753fcd1c-b59d-5a26-8099-ee063213fd58",
@@ -2474,7 +2672,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/rosario-fm",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "3402b1da-6371-5d30-8df9-da9b554b67e2",
@@ -2486,7 +2685,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/radio-internacional-fm",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "09da6f9b-97be-5459-93b1-acb263602c11",
@@ -2498,7 +2698,8 @@
     "codec": "MP3",
     "bitrate": 320,
     "website": "https://radios-online-uruguay.com/skorpio-fm",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 0
   },
   {
     "id": "fca0bc01-2b96-5d93-8331-7291cb7aa0d9",
@@ -2510,7 +2711,8 @@
     "codec": "AAC",
     "bitrate": 56,
     "website": "https://radios-online-uruguay.com/imagen-fm",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 130
   },
   {
     "id": "c10441db-53cf-5838-ae9e-18aa001bc9f6",
@@ -2522,7 +2724,8 @@
     "codec": "AAC",
     "bitrate": 160,
     "website": "https://radios-online-uruguay.com/radio-lavalleja",
-    "department": "Lavalleja"
+    "department": "Lavalleja",
+    "popularity": 0
   },
   {
     "id": "41d18967-2997-5f08-9c2c-9751d8c7d807",
@@ -2534,7 +2737,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/fm-de-la-cumbre",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "645cd6f8-adf4-5961-9e60-6aaa2400c0fe",
@@ -2546,7 +2750,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/reflejos-fm",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "170aab5e-760c-568a-bf31-fd5c873e471f",
@@ -2558,7 +2763,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/fm-tranqueras",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "a5f84724-9506-587c-a059-b15dcaaedde7",
@@ -2570,7 +2776,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/fm-piedra-alta",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 1565
   },
   {
     "id": "a5eface2-df07-5587-93d8-244c167cc3b4",
@@ -2582,7 +2789,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/sacramento-fm",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "a683a552-b52d-5ab2-ab9a-49509d25e64d",
@@ -2594,7 +2802,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/luna-fm",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "fb87f688-08c3-5777-8abb-1a76e2db5353",
@@ -2606,7 +2815,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/hiperactiva-fm",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "bb5a0822-c018-5b03-80f8-57cc8655c514",
@@ -2618,7 +2828,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/color-fm",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 5
   },
   {
     "id": "07f7edc8-0227-595b-a6e5-5d9594884eaf",
@@ -2630,7 +2841,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/fm-san-ramon",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "03eff71f-4cd6-5b5d-b525-0b82cfc44284",
@@ -2642,7 +2854,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "https://radios-online-uruguay.com/cinco",
-    "department": "Flores"
+    "department": "Flores",
+    "popularity": 5
   },
   {
     "id": "f6c6c394-b5e5-5345-af30-44965cac7673",
@@ -2654,7 +2867,8 @@
     "codec": "AAC",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/fm-salamanca",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "c64441eb-ddfa-5497-a70e-52dcfe1f2461",
@@ -2666,7 +2880,8 @@
     "codec": "AAC",
     "bitrate": 56,
     "website": "https://radios-online-uruguay.com/maragata-fm",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 0
   },
   {
     "id": "1c210da0-68fa-596f-a2f0-b66160b8f238",
@@ -2678,7 +2893,8 @@
     "codec": "MP3",
     "bitrate": 112,
     "website": "https://radios-online-uruguay.com/fm-claridad",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 0
   },
   {
     "id": "04ac5954-e3d3-5539-89ea-67339ec663e6",
@@ -2690,7 +2906,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/sirio-fm",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 0
   },
   {
     "id": "52e15ab1-6ae4-5761-91e1-b07e5b18ff06",
@@ -2702,7 +2919,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/la-paloma-fm",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "38e426ea-5bf9-5d1a-991f-6133a1ce1665",
@@ -2714,7 +2932,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "https://radios-online-uruguay.com/fm-voces",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "58c77acd-4ec7-574b-8f96-f0e6fa5858b2",
@@ -2726,7 +2945,8 @@
     "codec": "MP3",
     "bitrate": 320,
     "website": "https://radios-online-uruguay.com/palmira-fm",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "cb39aa27-9be2-5055-a39c-0ad48ddd839a",
@@ -2738,7 +2958,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/radio-young",
-    "department": "Río Negro"
+    "department": "Río Negro",
+    "popularity": 0
   },
   {
     "id": "7fa45b6a-ce74-5ad4-a3b0-002ec4b00e76",
@@ -2750,7 +2971,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/fm-integracion",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 0
   },
   {
     "id": "e5d82897-39a6-55e1-902c-d8b067e564b4",
@@ -2762,7 +2984,8 @@
     "codec": "AAC",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/centro-cardona",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 0
   },
   {
     "id": "01fb1409-9e47-5057-b61a-970eb89f0016",
@@ -2774,7 +2997,8 @@
     "codec": "MP3",
     "bitrate": 112,
     "website": "https://radios-online-uruguay.com/fm-san-fernando",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "674cb9c2-5bf1-56ab-8e1e-74480a442cc4",
@@ -2786,7 +3010,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/fm-del-cerro",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "00e00a3a-0262-5556-8719-bb695d85efee",
@@ -2798,7 +3023,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/alas-fm",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "e473b98f-0167-544b-9c66-e5c81f9abef4",
@@ -2810,7 +3036,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/equidad913",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "aec0cb77-b5f7-5168-a1e0-fa13166c93d0",
@@ -2822,7 +3049,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/pasion-tricolor",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 91
   },
   {
     "id": "cf3f0e57-444c-52cd-99ed-80e5f32e3fcc",
@@ -2834,7 +3062,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/la-galena-fm",
-    "department": "Cerro Largo"
+    "department": "Cerro Largo",
+    "popularity": 0
   },
   {
     "id": "2bb8aef9-9352-5512-9aa4-86dd6cd43c1e",
@@ -2846,7 +3075,8 @@
     "codec": "AAC",
     "bitrate": 48,
     "website": "https://radios-online-uruguay.com/radio-cien",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "ea95fc4f-96a3-5655-b8bc-a9b569ffb043",
@@ -2858,7 +3088,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/radio-parque",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "75ad1913-a4dc-5e87-a7d6-c316c85526ef",
@@ -2870,7 +3101,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/estilo-fm",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "ca9f40d4-4aab-5223-b16a-e52b1a84efa2",
@@ -2882,7 +3114,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/cadena-fm-dance-uruguay",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "5dbb4a3f-d13b-5dd3-ada4-525b4084ee77",
@@ -2894,7 +3127,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/radio-agraria",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 0
   },
   {
     "id": "bdd375ce-8a29-5c09-bd0e-4d5f9d5ab196",
@@ -2906,7 +3140,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/radio-encuentro",
-    "department": "Lavalleja"
+    "department": "Lavalleja",
+    "popularity": 0
   },
   {
     "id": "04edbf25-603d-5de0-ad55-781ec9c15c60",
@@ -2918,7 +3153,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/vintage",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "95601646-adfe-51a9-956a-c0d284e58897",
@@ -2930,7 +3166,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/ruta-fm",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 0
   },
   {
     "id": "7a05ba1a-6d98-56d3-ae35-e81f40d1cfbf",
@@ -2942,7 +3179,8 @@
     "codec": "AAC",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/oceanica-fm",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "7b4b1cad-971e-51d2-94e8-eb6f08d84585",
@@ -2954,7 +3192,8 @@
     "codec": "MP3",
     "bitrate": 0,
     "website": "https://radios-online-uruguay.com/radiocien",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "88d05c55-64c0-5477-8b9d-a303651222bd",
@@ -2966,7 +3205,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/919-fm-toros",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "9f2d589e-b5c8-55a9-bc92-e678c3626bb2",
@@ -2978,7 +3218,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/lider-fm",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 0
   },
   {
     "id": "5c032085-65b3-599d-a541-0122a9908b3d",
@@ -2990,7 +3231,8 @@
     "codec": "AAC",
     "bitrate": 32,
     "website": "https://radios-online-uruguay.com/la-kandela-fm",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "00dabe75-46a3-537f-b94e-5030c739dc3c",
@@ -3002,7 +3244,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/943-treinta-y-tres-fm",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 0
   },
   {
     "id": "ad29cf8f-d453-5970-b2a2-49c7907750d9",
@@ -3014,7 +3257,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/primavera-fm",
-    "department": "Soriano"
+    "department": "Soriano",
+    "popularity": 0
   },
   {
     "id": "a3cf8793-d6be-5020-8d65-291dd4878199",
@@ -3026,7 +3270,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/sorita",
-    "department": ""
+    "department": "",
+    "popularity": 0
   },
   {
     "id": "38466f9f-8c26-5f51-9ffa-1525edbe1549",
@@ -3038,7 +3283,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/893-diversidad-fm",
-    "department": "Durazno"
+    "department": "Durazno",
+    "popularity": 0
   },
   {
     "id": "5a68b054-5d78-5626-9e94-5934241e1fae",
@@ -3050,7 +3296,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/buenas-charqueada-fm",
-    "department": "Treinta y Tres"
+    "department": "Treinta y Tres",
+    "popularity": 0
   },
   {
     "id": "ce45b88c-ca33-5221-aa3b-d6888000a05a",
@@ -3062,7 +3309,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/radio-fortaleza",
-    "department": "Rocha"
+    "department": "Rocha",
+    "popularity": 0
   },
   {
     "id": "12fcbfa7-0bcd-53dc-9222-a8fd41b16293",
@@ -3074,7 +3322,8 @@
     "codec": "MP3",
     "bitrate": 256,
     "website": "https://radios-online-uruguay.com/fm-in-the-night",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "3785c661-b1f0-5706-a9b4-943bee139fd6",
@@ -3086,7 +3335,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/estacion-sayago",
-    "department": "Montevideo"
+    "department": "Montevideo",
+    "popularity": 0
   },
   {
     "id": "ba2f83f2-303f-54a4-afa5-14060ad9f4c6",
@@ -3098,7 +3348,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/fm-lumafe",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 0
   },
   {
     "id": "0870a93c-3a22-57a9-8e39-f45dd3875d93",
@@ -3110,7 +3361,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/radio-paysandu",
-    "department": "Paysandú"
+    "department": "Paysandú",
+    "popularity": 335
   },
   {
     "id": "b3053e80-3853-5603-8501-64b7e5ea030e",
@@ -3122,7 +3374,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/radio-del-oeste",
-    "department": "Colonia"
+    "department": "Colonia",
+    "popularity": 0
   },
   {
     "id": "c1c08962-17dd-5840-9af1-ced3c4741778",
@@ -3134,7 +3387,8 @@
     "codec": "MP3",
     "bitrate": 160,
     "website": "https://radios-online-uruguay.com/radio-activa",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "bc948dce-83e1-5143-9cb3-c62cb00b1848",
@@ -3146,7 +3400,8 @@
     "codec": "MP3",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/el-lugar-fm",
-    "department": "San José"
+    "department": "San José",
+    "popularity": 0
   },
   {
     "id": "3381951d-b1a2-543c-aeda-589cb4a45f2e",
@@ -3158,7 +3413,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/fm-florida",
-    "department": "Florida"
+    "department": "Florida",
+    "popularity": 0
   },
   {
     "id": "5f3e9d28-f713-5f67-8fcf-23fb4f1aa8df",
@@ -3170,7 +3426,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/milenium-fm-887",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "4e7ca848-c522-5594-8f35-5652739d1377",
@@ -3182,7 +3439,8 @@
     "codec": "MP3",
     "bitrate": 192,
     "website": "https://radios-online-uruguay.com/radio-internacional",
-    "department": "Rivera"
+    "department": "Rivera",
+    "popularity": 0
   },
   {
     "id": "2742472c-6a8c-59bc-b850-b7535fe8d3f0",
@@ -3194,7 +3452,8 @@
     "codec": "AAC",
     "bitrate": 64,
     "website": "https://radios-online-uruguay.com/fm-musica",
-    "department": "Tacuarembó"
+    "department": "Tacuarembó",
+    "popularity": 0
   },
   {
     "id": "35400e4a-fc2d-52c7-aeec-d410cbf082bb",
@@ -3206,7 +3465,8 @@
     "codec": "AAC",
     "bitrate": 96,
     "website": "https://radios-online-uruguay.com/radio-ciudadana",
-    "department": "Canelones"
+    "department": "Canelones",
+    "popularity": 0
   },
   {
     "id": "321be217-09f0-5af4-983f-b0f9838ae0de",
@@ -3218,7 +3478,8 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/881-fm-punta-del-este",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "de592165-20e9-5770-b6a7-9103422f70e1",
@@ -3230,7 +3491,8 @@
     "codec": "AAC",
     "bitrate": 112,
     "website": "https://radios-online-uruguay.com/fm-encuentro-883",
-    "department": "Maldonado"
+    "department": "Maldonado",
+    "popularity": 0
   },
   {
     "id": "89edcf16-40ee-5e27-bf33-b42c4178d605",
@@ -3242,6 +3504,7 @@
     "codec": "MP3",
     "bitrate": 128,
     "website": "https://radios-online-uruguay.com/radio-celeste-corazon",
-    "department": ""
+    "department": "",
+    "popularity": 0
   }
 ]
