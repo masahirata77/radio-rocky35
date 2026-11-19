@@ -70,11 +70,14 @@ class MainActivity : Activity() {
         val o=JSONObject();for((k,v) in plays)o.put(k,JSONArray().put(v[0]).put(v[1]))
         prefs.edit().putString("plays",o.toString()).apply()
     }
+    // Copia congelada de las escuchas: el orden solo cambia al tocar los botones de orden.
+    private var sortPlays:Map<String,LongArray>?=null
     private fun sortRows(r:IntArray):IntArray{
+        val sp=sortPlays?:plays.mapValues{it.value.copyOf()}.also{sortPlays=it}
         val c:Comparator<Int> = when(sortMode){
             1->compareByDescending<Int>{Catalog.popularity(it)}
-            2->compareByDescending<Int>{plays[Catalog.id(it)]?.get(1)?:0L}
-            3->compareByDescending<Int>{plays[Catalog.id(it)]?.get(0)?:0L}
+            2->compareByDescending<Int>{sp[Catalog.id(it)]?.get(1)?:0L}
+            3->compareByDescending<Int>{sp[Catalog.id(it)]?.get(0)?:0L}
             else->Comparator{a,b->Catalog.compareNames(a,b)}
         }
         val tie=Comparator<Int>{a,b->Catalog.compareNames(a,b)}
@@ -147,8 +150,8 @@ class MainActivity : Activity() {
         sortMode=prefs.getInt("sortMode",0).coerceIn(0,3);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
         val sorts=row();sortBtn=button("",fg).apply{background=shape(panel,12,line);contentDescription="Cambiar orden"};dirBtn=button("",fg).apply{background=shape(panel,12,line);textSize=18f;contentDescription="Invertir orden"}
         sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));root.addFull(sorts,40,9)
-        sortBtn.setOnClickListener{sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
-        dirBtn.setOnClickListener{sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
+        sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
+        dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
         adapter=StationAdapter();list=object:ListView(this@MainActivity){
