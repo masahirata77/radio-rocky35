@@ -3,6 +3,7 @@ package com.rocky35.radio
 import android.app.Activity
 import android.os.*
 import android.content.Context
+import android.content.Intent
 import android.database.ContentObserver
 import android.provider.Settings
 import android.media.AudioDeviceCallback
@@ -158,7 +159,7 @@ class MainActivity : Activity() {
         favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
         val volRow=row();volRow.addView(ImageView(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(muted);contentDescription="Volumen"},LinearLayout.LayoutParams(dp(22),dp(22)).apply{marginEnd=dp(4)});volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
         volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent,LinearLayout.LayoutParams(dp(42),-2).apply{marginEnd=dp(6)});gravityEnd(percent)
-        copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar tema";setOnClickListener{copySong()}}
+        copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar y buscar";setOnClickListener{copySong()}}
         volRow.addView(copy,LinearLayout.LayoutParams(dp(45),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
@@ -244,7 +245,12 @@ class MainActivity : Activity() {
     }
     private fun copySong(){
         if(song.isEmpty())return
-        RadioService.copyToClipboard(this,if(song.startsWith("🎙 "))"${now.text} · "+song.removePrefix("🎙 ") else song)
+        val prog=song.startsWith("🎙 ")
+        val text=if(prog)"${now.text} · "+song.removePrefix("🎙 ") else song
+        RadioService.copyToClipboard(this,text)
+        val q=if(prog)"${now.text} "+song.removePrefix("🎙 ").substringBefore(" · ") else song
+        try{startActivity(Intent(Intent.ACTION_WEB_SEARCH).putExtra(android.app.SearchManager.QUERY,q))}
+        catch(_:Exception){try{startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))))}catch(_:Exception){}}
     }
     private fun syncVolume(){
         if(!::volume.isInitialized||draggingVolume)return
