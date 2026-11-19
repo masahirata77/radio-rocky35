@@ -119,7 +119,7 @@ class MainActivity : Activity() {
         root.addFull(region,46,8)
         val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,9)
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
-        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT}
+        adapter=StationAdapter();list=ListView(this).apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_OVERLAY}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
