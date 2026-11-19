@@ -213,7 +213,10 @@ class MainActivity : Activity() {
         favTab.background=if(onlyFavorites)favOn else favOff
         adapter.notifyDataSetChanged();updatePlayer()
     }
-    private fun flip(id:String){if(!favorites.add(id))favorites.remove(id);prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply(); refresh()}
+    private fun flip(id:String){if(!favorites.add(id))favorites.remove(id);prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply()
+        // Mantener la lista en el mismo lugar al marcar o desmarcar una favorita.
+        val pos=list.firstVisiblePosition;val top=list.getChildAt(0)?.top?:0
+        refresh();list.setSelectionFromTop(pos.coerceAtMost(maxOf(0,rows.size-1)),top)}
     private fun playing()=phase=="playing"||phase=="loading"
     private fun listen(id:String){
         if(id==selected && playing()){startService(RadioService.pauseIntent(this));phase="paused"}
