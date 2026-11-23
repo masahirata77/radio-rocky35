@@ -246,15 +246,16 @@ class MainActivity : Activity() {
     // Guardar: copia al portapapeles y archivo en Descargas, sin pantallas intermedias.
     private fun saveBackup(){
         val text=backupJson();RadioService.copyToClipboard(this,text)
+        val fname="radio-rocky35-favoritas_"+java.text.SimpleDateFormat("dd-MM-yy_HH-mm",java.util.Locale.US).format(java.util.Date())+".json"
         var file=false
         try{
             if(Build.VERSION.SDK_INT>=29){
-                val v=android.content.ContentValues().apply{put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME,"radio-rocky35-favoritas.json");put(android.provider.MediaStore.MediaColumns.MIME_TYPE,"application/json");put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH,android.os.Environment.DIRECTORY_DOWNLOADS)}
+                val v=android.content.ContentValues().apply{put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME,fname);put(android.provider.MediaStore.MediaColumns.MIME_TYPE,"application/json");put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH,android.os.Environment.DIRECTORY_DOWNLOADS)}
                 contentResolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,v)?.let{u->contentResolver.openOutputStream(u)?.use{it.write(text.toByteArray())};file=true}
             }
         }catch(_:Exception){}
         android.app.AlertDialog.Builder(this).setTitle("Copia guardada")
-            .setMessage("${favorites.size} favoritas copiadas al portapapeles"+(if(file)" y guardadas en Descargas (radio-rocky35-favoritas.json)." else ".")+"\n\nAbrí la otra app y tocá «Restaurar copia».")
+            .setMessage("${favorites.size} favoritas copiadas al portapapeles"+(if(file)" y guardadas en Descargas ($fname)." else ".")+"\n\nAbrí la otra app y tocá «Restaurar copia».")
             .setPositiveButton("OK",null).show()
     }
     // Restaurar: primero del portapapeles; si no hay copia ahí, se elige el archivo.
