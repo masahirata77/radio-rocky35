@@ -21,3 +21,9 @@ App de Android para escuchar radios de Uruguay. Liviana, sin publicidad, sin ras
 ```
 ./gradlew :app:assembleRelease
 ```
+
+## Licencia
+
+Copyright (C) 2026 Andrés (Rocky).
+
+Este programa es software libre: se distribuye bajo la Licencia Pública General de GNU, versión 3 o posterior (GPL-3.0-or-later). Ver el archivo `LICENSE`.
