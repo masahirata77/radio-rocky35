@@ -155,7 +155,7 @@ class MainActivity : Activity() {
         sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
-        val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);val backupBtn=button("⇄",muted).apply{textSize=17f;contentDescription="Copia de favoritas";setOnClickListener{backupMenu()}};summary.addView(backupBtn,LinearLayout.LayoutParams(dp(40),dp(30)).apply{marginStart=dp(6)});root.addFull(summary,26,5)
+        val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);val backupBtn=button("💾 Copia",fg).apply{textSize=13f;background=shape(panel,10,line);setPadding(dp(10),0,dp(10),0);minWidth=0;minimumWidth=0;contentDescription="Guardar o restaurar favoritas";setOnClickListener{backupMenu()}};summary.addView(backupBtn,LinearLayout.LayoutParams(-2,dp(34)).apply{marginStart=dp(8)});root.addFull(summary,26,5)
         adapter=StationAdapter();list=object:ListView(this@MainActivity){
             // La estrellita de cada radio tiene prioridad sobre la barra de desplazamiento rápido.
             override fun onInterceptTouchEvent(ev:MotionEvent):Boolean{
