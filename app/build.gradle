@@ -6,8 +6,8 @@ android {
         applicationId 'com.rocky35.radio'
         minSdk 26
         targetSdk 37
-        versionCode 21
-        versionName '0.1.21'
+        versionCode 22
+        versionName '0.1.22'
     }
     packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
     buildTypes {

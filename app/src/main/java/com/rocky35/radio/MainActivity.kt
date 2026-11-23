@@ -242,30 +242,48 @@ class MainActivity : Activity() {
     private fun setTools(open:Boolean,tools:View){tools.visibility=if(open)View.VISIBLE else View.GONE;toolsBtn.text=if(open)"🔍 ▴" else "🔍 ▾";prefs.edit().putBoolean("toolsOpen",open).apply()}
     private fun setVolumeRow(open:Boolean,row:View){row.visibility=if(open)View.VISIBLE else View.GONE;volBtn.background=shape(if(open)blue else panel);prefs.edit().putBoolean("volOpen",open).apply()}
     // Copia de seguridad de favoritas e historial en un archivo JSON (sirve para pasar a la versión de F-Droid).
-    private fun saveBackup()=startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE,"radio-rocky35-favoritas.json"),41)
-    private fun restoreBackup()=startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"),42)
+    private fun backupJson()=JSONObject().put("app","radio-rocky35").put("version",1).put("favorites",JSONArray(favorites.toList())).put("plays",JSONObject(prefs.getString("plays","{}")?:"{}")).toString()
+    // Guardar: copia al portapapeles y archivo en Descargas, sin pantallas intermedias.
+    private fun saveBackup(){
+        val text=backupJson();RadioService.copyToClipboard(this,text)
+        var file=false
+        try{
+            if(Build.VERSION.SDK_INT>=29){
+                val v=android.content.ContentValues().apply{put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME,"radio-rocky35-favoritas.json");put(android.provider.MediaStore.MediaColumns.MIME_TYPE,"application/json");put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH,android.os.Environment.DIRECTORY_DOWNLOADS)}
+                contentResolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,v)?.let{u->contentResolver.openOutputStream(u)?.use{it.write(text.toByteArray())};file=true}
+            }
+        }catch(_:Exception){}
+        android.app.AlertDialog.Builder(this).setTitle("Copia guardada")
+            .setMessage("${favorites.size} favoritas copiadas al portapapeles"+(if(file)" y guardadas en Descargas (radio-rocky35-favoritas.json)." else ".")+"\n\nAbrí la otra app y tocá «Restaurar copia».")
+            .setPositiveButton("OK",null).show()
+    }
+    // Restaurar: primero del portapapeles; si no hay copia ahí, se elige el archivo.
+    private fun restoreBackup(){
+        val clip=try{getSystemService(android.content.ClipboardManager::class.java).primaryClip?.getItemAt(0)?.coerceToText(this)?.toString()}catch(_:Exception){null}
+        if(clip!=null&&clip.contains("\"radio-rocky35\"")&&importBackup(clip))return
+        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"),42)
+    }
+    private fun importBackup(text:String):Boolean{
+        return try{
+            val o=JSONObject(text)
+            val f=o.optJSONArray("favorites")?:JSONArray();var n=0
+            for(i in 0 until f.length()){val id=f.getString(i);if(Catalog.station(id).isNotEmpty()&&favorites.add(id))n++}
+            prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply()
+            o.optJSONObject("plays")?.let{pl->
+                for(k in pl.keys()){val a=pl.getJSONArray(k);val cur=plays.getOrPut(k){longArrayOf(0,0)};cur[0]=maxOf(cur[0],a.getLong(0));cur[1]=maxOf(cur[1],a.getLong(1))}
+                val out=JSONObject();for((k,v) in plays)out.put(k,JSONArray().put(v[0]).put(v[1]));prefs.edit().putString("plays",out.toString()).apply()
+            }
+            sortPlays=null;refresh()
+            android.app.AlertDialog.Builder(this).setTitle("Copia restaurada").setMessage("$n favoritas nuevas. Ahora tenés ${favorites.size} favoritas.").setPositiveButton("OK",null).show()
+            true
+        }catch(e:Exception){false}
+    }
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(req:Int,res:Int,data:Intent?){
         super.onActivityResult(req,res,data)
-        val uri=data?.data;if(res!=RESULT_OK||uri==null)return
-        try{
-            if(req==41){
-                val o=JSONObject().put("app","radio-rocky35").put("version",1).put("favorites",JSONArray(favorites.toList())).put("plays",JSONObject(prefs.getString("plays","{}")?:"{}"))
-                contentResolver.openOutputStream(uri,"wt")!!.use{it.write(o.toString(1).toByteArray())}
-                android.widget.Toast.makeText(this,"Copia guardada: ${favorites.size} favoritas",android.widget.Toast.LENGTH_SHORT).show()
-            }else if(req==42){
-                val o=JSONObject(contentResolver.openInputStream(uri)!!.use{String(it.readBytes())})
-                val f=o.optJSONArray("favorites")?:JSONArray();var n=0
-                for(i in 0 until f.length()){val id=f.getString(i);if(Catalog.station(id).isNotEmpty()&&favorites.add(id))n++}
-                prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply()
-                o.optJSONObject("plays")?.let{pl->
-                    for(k in pl.keys()){val a=pl.getJSONArray(k);val cur=plays.getOrPut(k){longArrayOf(0,0)};cur[0]=maxOf(cur[0],a.getLong(0));cur[1]=maxOf(cur[1],a.getLong(1))}
-                    val out=JSONObject();for((k,v) in plays)out.put(k,JSONArray().put(v[0]).put(v[1]));prefs.edit().putString("plays",out.toString()).apply()
-                }
-                sortPlays=null;refresh()
-                android.widget.Toast.makeText(this,"Restauradas: $n favoritas nuevas",android.widget.Toast.LENGTH_SHORT).show()
-            }
-        }catch(e:Exception){android.widget.Toast.makeText(this,"No se pudo leer el archivo",android.widget.Toast.LENGTH_SHORT).show()}
+        val uri=data?.data;if(res!=RESULT_OK||uri==null||req!=42)return
+        val ok=try{importBackup(contentResolver.openInputStream(uri)!!.use{String(it.readBytes())})}catch(_:Exception){false}
+        if(!ok)android.widget.Toast.makeText(this,"No se pudo leer el archivo",android.widget.Toast.LENGTH_SHORT).show()
     }
     // ⏮ ⏭: recorren la lista que se está viendo (Todas o Favoritas, con su orden y filtros).
     private fun skip(d:Int){
