@@ -139,7 +139,7 @@ class MainActivity : Activity() {
         val header=row();val mark=label("◉",25f,fg,true).apply {gravity=Gravity.CENTER;background=shape(Color.rgb(22,74,158))}
         header.addView(mark,LinearLayout.LayoutParams(dp(46),dp(46)).apply {marginEnd=dp(11)})
         val titles=col();titles.addFull(label("Radio Rocky 35",25f,fg,true));titles.addFull(label("RADIOS DE URUGUAY",11f,muted));header.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
-        val tools=col();toolsBtn=button("",fg).apply{background=shape(panel,12,line);textSize=15f;contentDescription="Mostrar u ocultar búsqueda y orden";setOnClickListener{setTools(tools.visibility!=View.VISIBLE,tools)}};header.addView(toolsBtn,LinearLayout.LayoutParams(dp(64),dp(42)))
+        val tools=col();toolsBtn=button("",fg).apply{setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search,0,0,0);compoundDrawableTintList=ColorStateList.valueOf(fg);compoundDrawablePadding=dp(2);setPadding(dp(8),0,dp(8),0);background=shape(panel,12,line);textSize=15f;contentDescription="Mostrar u ocultar búsqueda y orden";setOnClickListener{setTools(tools.visibility!=View.VISIBLE,tools)}};header.addView(toolsBtn,LinearLayout.LayoutParams(dp(64),dp(42)))
         root.addFull(header,48,10)
         root.addFull(tools);setTools(false,tools)
         search=EditText(this).apply {hint="Buscar emisora…";setSingleLine(true);textSize=16f;setTextColor(fg);setHintTextColor(muted);background=shape(panel,12,line);setPadding(dp(12),0,dp(12),0);inputType=android.text.InputType.TYPE_CLASS_TEXT}
@@ -151,7 +151,7 @@ class MainActivity : Activity() {
         val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,6)
         sortMode=prefs.getInt("sortMode",0).coerceIn(0,3);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
         val sorts=row();sortBtn=button("",fg).apply{background=shape(panel,12,line);contentDescription="Cambiar orden"};dirBtn=button("",fg).apply{background=shape(panel,12,line);textSize=18f;contentDescription="Invertir orden"}
-        sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));tools.addFull(sorts,40,9);val copies=row();val saveB=button("💾 Guardar copia",fg).apply{textSize=13f;background=shape(panel,12,line);setOnClickListener{saveBackup()}};val loadB=button("📂 Restaurar copia",fg).apply{textSize=13f;background=shape(panel,12,line);setOnClickListener{restoreBackup()}};copies.addView(saveB,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});copies.addView(loadB,LinearLayout.LayoutParams(0,dp(40),1f));tools.addFull(copies,40,9)
+        sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));tools.addFull(sorts,40,9);val copies=row();val saveB=button("Guardar copia",fg).apply{setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_save,0,0,0);compoundDrawableTintList=ColorStateList.valueOf(fg);compoundDrawablePadding=dp(6);setPadding(dp(12),0,dp(12),0);textSize=13f;background=shape(panel,12,line);setOnClickListener{saveBackup()}};val loadB=button("Restaurar copia",fg).apply{setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_restore,0,0,0);compoundDrawableTintList=ColorStateList.valueOf(fg);compoundDrawablePadding=dp(6);setPadding(dp(12),0,dp(12),0);textSize=13f;background=shape(panel,12,line);setOnClickListener{restoreBackup()}};copies.addView(saveB,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});copies.addView(loadB,LinearLayout.LayoutParams(0,dp(40),1f));tools.addFull(copies,40,9)
         sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
@@ -239,7 +239,7 @@ class MainActivity : Activity() {
     private fun playing()=phase=="playing"||phase=="loading"
     private lateinit var toolsBtn:Button
     private lateinit var volBtn:ImageButton
-    private fun setTools(open:Boolean,tools:View){tools.visibility=if(open)View.VISIBLE else View.GONE;toolsBtn.text=if(open)"🔍 ▴" else "🔍 ▾";prefs.edit().putBoolean("toolsOpen",open).apply()}
+    private fun setTools(open:Boolean,tools:View){tools.visibility=if(open)View.VISIBLE else View.GONE;toolsBtn.text=if(open)"▴" else "▾";prefs.edit().putBoolean("toolsOpen",open).apply()}
     private fun setVolumeRow(open:Boolean,row:View){row.visibility=if(open)View.VISIBLE else View.GONE;volBtn.background=shape(if(open)blue else panel);prefs.edit().putBoolean("volOpen",open).apply()}
     // Copia de seguridad de favoritas e historial en un archivo JSON (sirve para pasar a la versión de F-Droid).
     private fun backupJson()=JSONObject().put("app","radio-rocky35").put("version",1).put("favorites",JSONArray(favorites.toList())).put("plays",JSONObject(prefs.getString("plays","{}")?:"{}")).toString()

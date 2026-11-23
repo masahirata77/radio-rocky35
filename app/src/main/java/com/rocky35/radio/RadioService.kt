@@ -270,8 +270,8 @@ class RadioService : android.service.media.MediaBrowserService() {
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP or PlaybackState.ACTION_SKIP_TO_NEXT or PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
-                if(p=="playing"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
-                if(p=="playing"&&searchIntent()!=null)addCustomAction(PlaybackState.CustomAction.Builder(SEARCH,"Buscar",R.drawable.ic_search).build())
+                if(p!="stopped"&&p!="error"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
+                if(p!="stopped"&&p!="error"&&searchIntent()!=null)addCustomAction(PlaybackState.CustomAction.Builder(SEARCH,"Buscar",R.drawable.ic_search).build())
                 addCustomAction(PlaybackState.CustomAction.Builder(STOP,"Detener",R.drawable.ic_stop).build())
             }.build())
         if(foreground)getSystemService(NotificationManager::class.java).notify(NOTIFICATION,notification())
@@ -286,9 +286,9 @@ class RadioService : android.service.media.MediaBrowserService() {
         val b=Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
             .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
             .setContentTitle(nowTitle().first).setContentText(if(phase=="playing"&&song.isNotEmpty())name else if(phase=="playing"&&nowTitle().second.isNotEmpty())nowTitle().second else message).addAction(Notification.Action.Builder(R.drawable.ic_prev,"Anterior",PendingIntent.getService(this,8,Intent(this,RadioService::class.java).setAction(PREV),f)).build()).addAction(main).addAction(Notification.Action.Builder(R.drawable.ic_next,"Siguiente",PendingIntent.getService(this,9,Intent(this,RadioService::class.java).setAction(NEXT),f)).build()).addAction(stop)
-        val hasSong=phase=="playing"&&copyText()!=null
+        val keep=phase!="stopped"&&phase!="error";val hasSong=keep&&copyText()!=null
         if(hasSong)b.addAction(Notification.Action.Builder(R.drawable.ic_copy,"Copiar",PendingIntent.getService(this,5,Intent(this,RadioService::class.java).setAction(COPY),f)).build())
-        val web=if(phase=="playing")searchIntent() else null
+        val web=if(keep)searchIntent() else null
         if(web!=null)b.addAction(Notification.Action.Builder(R.drawable.ic_search,"Buscar",PendingIntent.getActivity(this,6,web,f)).build())
         return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0,1,2)).build()
     }
