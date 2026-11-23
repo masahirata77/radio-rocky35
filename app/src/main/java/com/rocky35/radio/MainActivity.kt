@@ -153,7 +153,7 @@ class MainActivity : Activity() {
         sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
-        val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
+        val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);val backupBtn=button("⇄",muted).apply{textSize=17f;contentDescription="Copia de favoritas";setOnClickListener{backupMenu()}};summary.addView(backupBtn,LinearLayout.LayoutParams(dp(40),dp(30)).apply{marginStart=dp(6)});root.addFull(summary,26,5)
         adapter=StationAdapter();list=object:ListView(this@MainActivity){
             // La estrellita de cada radio tiene prioridad sobre la barra de desplazamiento rápido.
             override fun onInterceptTouchEvent(ev:MotionEvent):Boolean{
@@ -226,6 +226,37 @@ class MainActivity : Activity() {
         val pos=list.firstVisiblePosition;val top=list.getChildAt(0)?.top?:0
         refresh();list.setSelectionFromTop(pos.coerceAtMost(maxOf(0,rows.size-1)),top)}
     private fun playing()=phase=="playing"||phase=="loading"
+    // Copia de seguridad de favoritas e historial en un archivo JSON (sirve para pasar a la versión de F-Droid).
+    private fun backupMenu(){
+        android.app.AlertDialog.Builder(this).setTitle("Copia de favoritas")
+            .setItems(arrayOf("Guardar copia","Restaurar copia")){_,w->
+                if(w==0)startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE,"radio-rocky35-favoritas.json"),41)
+                else startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"),42)
+            }.show()
+    }
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(req:Int,res:Int,data:Intent?){
+        super.onActivityResult(req,res,data)
+        val uri=data?.data;if(res!=RESULT_OK||uri==null)return
+        try{
+            if(req==41){
+                val o=JSONObject().put("app","radio-rocky35").put("version",1).put("favorites",JSONArray(favorites.toList())).put("plays",JSONObject(prefs.getString("plays","{}")?:"{}"))
+                contentResolver.openOutputStream(uri,"wt")!!.use{it.write(o.toString(1).toByteArray())}
+                android.widget.Toast.makeText(this,"Copia guardada: ${favorites.size} favoritas",android.widget.Toast.LENGTH_SHORT).show()
+            }else if(req==42){
+                val o=JSONObject(contentResolver.openInputStream(uri)!!.use{String(it.readBytes())})
+                val f=o.optJSONArray("favorites")?:JSONArray();var n=0
+                for(i in 0 until f.length()){val id=f.getString(i);if(Catalog.station(id).isNotEmpty()&&favorites.add(id))n++}
+                prefs.edit().putString("favorites",JSONArray(favorites.toList()).toString()).apply()
+                o.optJSONObject("plays")?.let{pl->
+                    for(k in pl.keys()){val a=pl.getJSONArray(k);val cur=plays.getOrPut(k){longArrayOf(0,0)};cur[0]=maxOf(cur[0],a.getLong(0));cur[1]=maxOf(cur[1],a.getLong(1))}
+                    val out=JSONObject();for((k,v) in plays)out.put(k,JSONArray().put(v[0]).put(v[1]));prefs.edit().putString("plays",out.toString()).apply()
+                }
+                sortPlays=null;refresh()
+                android.widget.Toast.makeText(this,"Restauradas: $n favoritas nuevas",android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }catch(e:Exception){android.widget.Toast.makeText(this,"No se pudo leer el archivo",android.widget.Toast.LENGTH_SHORT).show()}
+    }
     // ⏮ ⏭: recorren la lista que se está viendo (Todas o Favoritas, con su orden y filtros).
     private fun skip(d:Int){
         if(rows.isEmpty())return
