@@ -10,11 +10,26 @@ android {
         versionName '0.1.27'
     }
     packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
+    // Clave de publicación fuera del repositorio (~/.android-keys). Si no existe (por ejemplo en F-Droid), release queda sin firmar.
+    def keyProps = new Properties()
+    def keyFile = new File(System.getProperty('user.home'), '.android-keys/radio-rocky35.properties')
+    if (keyFile.exists()) keyFile.withInputStream { keyProps.load(it) }
+    signingConfigs {
+        if (keyFile.exists()) {
+            release {
+                storeFile file(keyProps['storeFile'])
+                storePassword keyProps['storePassword']
+                keyAlias keyProps['keyAlias']
+                keyPassword keyProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         // Versión que compila F-Droid: optimizada y sin firmar (F-Droid la firma con su clave).
         release {
             minifyEnabled true
             shrinkResources true
+            if (keyFile.exists()) signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         optimized {
