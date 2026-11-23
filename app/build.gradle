@@ -3,11 +3,11 @@ android {
     namespace 'com.rocky35.radio'
     compileSdk 37
     defaultConfig {
-        applicationId 'com.rocky35.radio.kotlinpuro'
+        applicationId 'com.rocky35.radio'
         minSdk 26
         targetSdk 37
-        versionCode 15
-        versionName '0.1.15'
+        versionCode 16
+        versionName '0.1.16'
     }
     packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
     buildTypes {
