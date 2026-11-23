@@ -11,6 +11,12 @@ android {
     }
     packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
     buildTypes {
+        // Versión que compila F-Droid: optimizada y sin firmar (F-Droid la firma con su clave).
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         optimized {
             initWith debug
             debuggable false
