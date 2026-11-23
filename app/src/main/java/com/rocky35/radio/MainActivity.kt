@@ -141,7 +141,7 @@ class MainActivity : Activity() {
         val titles=col();titles.addFull(label("Radio Rocky 35",25f,fg,true));titles.addFull(label("RADIOS DE URUGUAY",11f,muted));header.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
         val tools=col();toolsBtn=button("",fg).apply{background=shape(panel,12,line);textSize=15f;contentDescription="Mostrar u ocultar búsqueda y orden";setOnClickListener{setTools(tools.visibility!=View.VISIBLE,tools)}};header.addView(toolsBtn,LinearLayout.LayoutParams(dp(64),dp(42)))
         root.addFull(header,48,10)
-        root.addFull(tools);setTools(prefs.getBoolean("toolsOpen",true),tools)
+        root.addFull(tools);setTools(false,tools)
         search=EditText(this).apply {hint="Buscar emisora…";setSingleLine(true);textSize=16f;setTextColor(fg);setHintTextColor(muted);background=shape(panel,12,line);setPadding(dp(12),0,dp(12),0);inputType=android.text.InputType.TYPE_CLASS_TEXT}
         tools.addFull(search,46,8)
         region=Spinner(this).apply {background=shape(panel,12,line);setPadding(dp(10),0,dp(10),0)}
