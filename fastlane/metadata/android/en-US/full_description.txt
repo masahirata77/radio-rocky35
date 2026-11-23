@@ -1,0 +1,15 @@
+Radio Rocky 35 is a simple, lightweight app to listen to radio stations from Uruguay.
+
+<b>Features</b>
+<ul>
+<li>263 Uruguayan stations, with search and filter by department.</li>
+<li>Favorites.</li>
+<li>Sort by name, popularity, recently played or most played.</li>
+<li>Shows the current song when the station sends it, and the schedule of some stations.</li>
+<li>Background playback with notification controls: pause, stop, copy and search the song.</li>
+<li>Automatic reconnection.</li>
+</ul>
+
+No ads, no trackers and no Google libraries. The APK is under 100 KB.
+
+The app's interface is in Spanish.

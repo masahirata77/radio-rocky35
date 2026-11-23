@@ -1,0 +1,13 @@
+Radio Rocky 35 es una app simple y liviana para escuchar radios de Uruguay.
+
+<b>Funciones</b>
+<ul>
+<li>263 emisoras uruguayas, con búsqueda y filtro por departamento.</li>
+<li>Favoritas.</li>
+<li>Orden por nombre, popularidad, últimas escuchadas o más escuchadas.</li>
+<li>Muestra el tema que suena, cuando la radio lo envía, y la programación de algunas radios.</li>
+<li>Reproducción en segundo plano con controles en la notificación: pausa, detener, copiar y buscar el tema.</li>
+<li>Reconexión automática.</li>
+</ul>
+
+Sin publicidad, sin rastreadores y sin librerías de Google. El APK pesa menos de 100 KB.
