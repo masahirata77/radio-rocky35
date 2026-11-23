@@ -138,18 +138,20 @@ class MainActivity : Activity() {
         }
         val header=row();val mark=label("◉",25f,fg,true).apply {gravity=Gravity.CENTER;background=shape(Color.rgb(22,74,158))}
         header.addView(mark,LinearLayout.LayoutParams(dp(46),dp(46)).apply {marginEnd=dp(11)})
-        val titles=col();titles.addFull(label("Radio Rocky 35",25f,fg,true));titles.addFull(label("RADIOS DE URUGUAY",11f,muted));header.addView(titles)
+        val titles=col();titles.addFull(label("Radio Rocky 35",25f,fg,true));titles.addFull(label("RADIOS DE URUGUAY",11f,muted));header.addView(titles,LinearLayout.LayoutParams(0,-2,1f))
+        val tools=col();toolsBtn=button("",fg).apply{background=shape(panel,12,line);textSize=15f;contentDescription="Mostrar u ocultar búsqueda y orden";setOnClickListener{setTools(tools.visibility!=View.VISIBLE,tools)}};header.addView(toolsBtn,LinearLayout.LayoutParams(dp(64),dp(42)))
         root.addFull(header,48,10)
+        root.addFull(tools);setTools(prefs.getBoolean("toolsOpen",true),tools)
         search=EditText(this).apply {hint="Buscar emisora…";setSingleLine(true);textSize=16f;setTextColor(fg);setHintTextColor(muted);background=shape(panel,12,line);setPadding(dp(12),0,dp(12),0);inputType=android.text.InputType.TYPE_CLASS_TEXT}
-        root.addFull(search,46,8)
+        tools.addFull(search,46,8)
         region=Spinner(this).apply {background=shape(panel,12,line);setPadding(dp(10),0,dp(10),0)}
         val names=departments.map { when(it){""->"Todos los departamentos";"unknown"->"Sin departamento confirmado";else->it} }
         region.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_item,names).apply {setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)}
-        root.addFull(region,46,8)
+        tools.addFull(region,46,8)
         val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,6)
         sortMode=prefs.getInt("sortMode",0).coerceIn(0,3);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
         val sorts=row();sortBtn=button("",fg).apply{background=shape(panel,12,line);contentDescription="Cambiar orden"};dirBtn=button("",fg).apply{background=shape(panel,12,line);textSize=18f;contentDescription="Invertir orden"}
-        sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));root.addFull(sorts,40,9)
+        sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));tools.addFull(sorts,40,9)
         sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
@@ -171,19 +173,28 @@ class MainActivity : Activity() {
         }.apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET;setPadding(0,0,dp(14),0);clipToPadding=false}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
-        val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
+        // Renglón 1: radio y lo que suena + estrellita.
+        val playing=row()
+        val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
+        favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,50,6)
+        // Renglón 2: play a la izquierda, atrás y siguiente juntos; copiar, buscar y volumen a la derecha.
+        val controls=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
         val prevBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_prev);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Radio anterior";setOnClickListener{skip(-1)}}
         val nextBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_next);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Radio siguiente";setOnClickListener{skip(1)}}
-        playing.addView(prevBtn,LinearLayout.LayoutParams(dp(38),dp(50)).apply{marginEnd=dp(4)})
-        playing.addView(toggle,LinearLayout.LayoutParams(dp(50),dp(50)).apply{marginEnd=dp(4)})
-        playing.addView(nextBtn,LinearLayout.LayoutParams(dp(38),dp(50)).apply{marginEnd=dp(8)})
-        val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
-        favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
-        val volRow=row();volRow.addView(ImageView(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(muted);contentDescription="Volumen"},LinearLayout.LayoutParams(dp(22),dp(22)).apply{marginEnd=dp(4)});volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
-        volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent,LinearLayout.LayoutParams(dp(42),-2).apply{marginEnd=dp(6)});gravityEnd(percent)
+        controls.addView(toggle,LinearLayout.LayoutParams(dp(54),dp(46)).apply{marginEnd=dp(14)})
+        controls.addView(prevBtn,LinearLayout.LayoutParams(dp(46),dp(42)).apply{marginEnd=dp(3)})
+        controls.addView(nextBtn,LinearLayout.LayoutParams(dp(46),dp(42)))
+        controls.addView(View(this),LinearLayout.LayoutParams(0,1,1f))
         copy=ImageButton(this).apply{setImageResource(R.drawable.ic_copy);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Copiar";setOnClickListener{copySong()}}
         searchBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_search);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Buscar en el navegador";setOnClickListener{searchSong()}}
-        volRow.addView(copy,LinearLayout.LayoutParams(dp(42),dp(38)).apply{marginEnd=dp(5)});volRow.addView(searchBtn,LinearLayout.LayoutParams(dp(42),dp(38)));updateCopy();player.addFull(volRow,40);root.addFull(player)
+        val volRow=row()
+        volBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Mostrar volumen";setOnClickListener{setVolumeRow(volRow.visibility!=View.VISIBLE,volRow)}}
+        controls.addView(copy,LinearLayout.LayoutParams(dp(44),dp(42)).apply{marginEnd=dp(6)});controls.addView(searchBtn,LinearLayout.LayoutParams(dp(44),dp(42)).apply{marginEnd=dp(6)});controls.addView(volBtn,LinearLayout.LayoutParams(dp(44),dp(42)))
+        player.addFull(controls,46,4)
+        // Renglón 3 (opcional): barra de volumen.
+        volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
+        volRow.addView(volume,LinearLayout.LayoutParams(0,dp(40),1f));percent=label("",13f,muted);volRow.addView(percent,LinearLayout.LayoutParams(dp(46),-2));gravityEnd(percent)
+        updateCopy();player.addFull(volRow,40);setVolumeRow(prefs.getBoolean("volOpen",false),volRow);root.addFull(player)
         setContentView(root);root.requestApplyInsets()
         if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!prefs.getBoolean("askedNotif",false)){prefs.edit().putBoolean("askedNotif",true).apply();requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),35)}
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
@@ -226,6 +237,10 @@ class MainActivity : Activity() {
         val pos=list.firstVisiblePosition;val top=list.getChildAt(0)?.top?:0
         refresh();list.setSelectionFromTop(pos.coerceAtMost(maxOf(0,rows.size-1)),top)}
     private fun playing()=phase=="playing"||phase=="loading"
+    private lateinit var toolsBtn:Button
+    private lateinit var volBtn:ImageButton
+    private fun setTools(open:Boolean,tools:View){tools.visibility=if(open)View.VISIBLE else View.GONE;toolsBtn.text=if(open)"🔍 ▴" else "🔍 ▾";prefs.edit().putBoolean("toolsOpen",open).apply()}
+    private fun setVolumeRow(open:Boolean,row:View){row.visibility=if(open)View.VISIBLE else View.GONE;volBtn.background=shape(if(open)blue else panel);prefs.edit().putBoolean("volOpen",open).apply()}
     // Copia de seguridad de favoritas e historial en un archivo JSON (sirve para pasar a la versión de F-Droid).
     private fun backupMenu(){
         android.app.AlertDialog.Builder(this).setTitle("Copia de favoritas")
