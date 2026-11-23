@@ -9,7 +9,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.*
 
-class RadioService : Service() {
+class RadioService : android.service.media.MediaBrowserService() {
     companion object {
         private const val PLAY = "com.rocky35.radio.PLAY"
         private const val PAUSE = "com.rocky35.radio.PAUSE"
@@ -17,6 +17,10 @@ class RadioService : Service() {
         private const val RESUME = "com.rocky35.radio.RESUME"
         private const val COPY = "com.rocky35.radio.COPY"
         private const val SEARCH = "com.rocky35.radio.SEARCH"
+        private const val NEXT = "com.rocky35.radio.NEXT"
+        private const val PREV = "com.rocky35.radio.PREV"
+        // Lista que ve el usuario (Todas o Favoritas, con orden y filtros): la usan ⏮ ⏭ de la notificación, el volante y Android Auto.
+        fun setQueue(c:Context,ids:List<String>){c.getSharedPreferences("radio",Context.MODE_PRIVATE).edit().putString("queue",ids.joinToString(",")).apply()}
         private const val CHANNEL = "radio_playback"
         private const val NOTIFICATION = 35
         data class Snapshot(val id:String, val name:String, val phase:String, val message:String, val title:String="")
@@ -99,7 +103,7 @@ class RadioService : Service() {
         if(sid!=id)return
         if(!usefulTitle(t,st)){titleMisses++;if(titleMisses>=3&&song.isNotEmpty()){song="";publish(phase,message)};return}
         titleMisses=0
-        if(t!=song){song=t!!;session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,song).build());publish(phase,message)}
+        if(t!=song){song=t!!;publish(phase,message)}
     }
     private fun markDown(on:Boolean){
         if(id.isEmpty())return
@@ -129,9 +133,17 @@ class RadioService : Service() {
             override fun onPause(){pausePlayback()}
             override fun onStop(){stopPlayback("stopped","Detenida")}
             override fun onPlay(){if(phase!="playing"&&phase!="loading")resume()}
+            override fun onSkipToNext(){skip(1)}
+            override fun onSkipToPrevious(){skip(-1)}
+            override fun onPlayFromMediaId(mediaId:String?,extras:Bundle?){
+                val m=mediaId?:return;val sid=m.substringAfter(':')
+                setQueue(this@RadioService,if(m.startsWith("fav:"))favIds() else allIds())
+                startService(Intent(this@RadioService,RadioService::class.java));begin(sid)
+            }
             override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->copyText()?.let{copyToClipboard(this@RadioService,it)};SEARCH->searchPrompt()}}
         })
         session.setSessionActivity(openApp());session.isActive=true
+        sessionToken=session.sessionToken
         try{getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(network)}catch(_:RuntimeException){}
     }
     override fun onStartCommand(intent:Intent?,flags:Int,startId:Int):Int{
@@ -140,6 +152,8 @@ class RadioService : Service() {
             PAUSE->pausePlayback()
             STOP->stopPlayback("stopped","Detenida")
             RESUME->resume()
+            NEXT->skip(1)
+            PREV->skip(-1)
             COPY->{copyText()?.let{copyToClipboard(this,it)};if(!foreground)stopSelf()}
             else->stopSelf()
         }
@@ -158,7 +172,7 @@ class RadioService : Service() {
         index=0;round=0;song="";titleMisses=0
         handler.removeCallbacks(titleTick);handler.postDelayed(titleTick,4000)
         handler.removeCallbacks(programTick);program="";if(Programs.has(name))handler.post(programTick)
-        session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,name).putString(MediaMetadata.METADATA_KEY_ARTIST,"Radio Rocky 35").build())
+        lastMeta="";updateMetadata()
         publish("loading","Conectando…")
         ensureForeground()
         if(!focus)focus=audio.requestAudioFocus(focusRequest)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED
@@ -233,10 +247,28 @@ class RadioService : Service() {
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION)
         stopSelf()
     }
+    // Texto principal (chip de la barra de estado, persiana y notificación):
+    // tema si la radio lo manda; si no, "Radio · Programa"; si no, solo la radio.
+    private fun nowTitle():Pair<String,String>{
+        val live=phase=="playing"
+        val prog=program.removePrefix("🎙 ")
+        return when{
+            live&&song.isNotEmpty()->song to name
+            live&&program.isNotEmpty()&&program!="🎙 Selección musical"->"$name · ${prog.substringBefore(" · ")}" to prog.substringAfter(" · ","")
+            else->name to "Radio Rocky 35"
+        }
+    }
+    private var lastMeta=""
+    private fun updateMetadata(){
+        val (t,sub)=nowTitle();val k="$t|$sub"
+        if(k==lastMeta)return;lastMeta=k
+        session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,t).putString(MediaMetadata.METADATA_KEY_ARTIST,sub).putString(MediaMetadata.METADATA_KEY_ALBUM,name).build())
+    }
     private fun publish(p:String,text:String){
+        updateMetadata()
         phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song.ifEmpty{program} else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
-        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
+        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP or PlaybackState.ACTION_SKIP_TO_NEXT or PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
                 if(p=="playing"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
                 if(p=="playing"&&searchIntent()!=null)addCustomAction(PlaybackState.CustomAction.Builder(SEARCH,"Buscar",R.drawable.ic_search).build())
@@ -253,12 +285,12 @@ class RadioService : Service() {
         val stop=Notification.Action.Builder(R.drawable.ic_stop,"Detener",PendingIntent.getService(this,2,stopIntent(this),f)).build()
         val b=Notification.Builder(this,CHANNEL).setSmallIcon(R.drawable.ic_radio_notification).setContentIntent(openApp()).setVisibility(Notification.VISIBILITY_PUBLIC).setOnlyAlertOnce(true).setOngoing(active)
             .setDeleteIntent(PendingIntent.getService(this,4,stopIntent(this),f))
-            .setContentTitle(name).setContentText(if(phase=="playing"&&song.isNotEmpty())"♪ $song" else if(phase=="playing"&&program.isNotEmpty())program else message).addAction(main).addAction(stop)
+            .setContentTitle(nowTitle().first).setContentText(if(phase=="playing"&&song.isNotEmpty())name else if(phase=="playing"&&nowTitle().second.isNotEmpty())nowTitle().second else message).addAction(Notification.Action.Builder(R.drawable.ic_prev,"Anterior",PendingIntent.getService(this,8,Intent(this,RadioService::class.java).setAction(PREV),f)).build()).addAction(main).addAction(Notification.Action.Builder(R.drawable.ic_next,"Siguiente",PendingIntent.getService(this,9,Intent(this,RadioService::class.java).setAction(NEXT),f)).build()).addAction(stop)
         val hasSong=phase=="playing"&&copyText()!=null
         if(hasSong)b.addAction(Notification.Action.Builder(R.drawable.ic_copy,"Copiar",PendingIntent.getService(this,5,Intent(this,RadioService::class.java).setAction(COPY),f)).build())
         val web=if(phase=="playing")searchIntent() else null
         if(web!=null)b.addAction(Notification.Action.Builder(R.drawable.ic_search,"Buscar",PendingIntent.getActivity(this,6,web,f)).build())
-        return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).apply{if(hasSong)setShowActionsInCompactView(0,1,2) else setShowActionsInCompactView(0,1)}).build()
+        return b.setStyle(Notification.MediaStyle().setMediaSession(session.sessionToken).setShowActionsInCompactView(0,1,2)).build()
     }
     // Tema si la radio lo manda; si no, radio + programa de la grilla.
     private fun copyText():String?=when{
@@ -285,7 +317,29 @@ class RadioService : Service() {
         }
         return Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))).addCategory(Intent.CATEGORY_BROWSABLE)
     }
-    override fun onBind(intent:Intent?):IBinder?=null
+    override fun onBind(intent:Intent?):IBinder?=if(intent?.action==SERVICE_INTERFACE)super.onBind(intent) else null
+    private fun prefs()=getSharedPreferences("radio",MODE_PRIVATE)
+    private fun allIds()=(0 until Catalog.size).map{Catalog.id(it)}
+    private fun favIds():List<String>{val out=ArrayList<String>();try{val a=org.json.JSONArray(prefs().getString("favorites","[]")?:"[]");for(i in 0 until a.length())out.add(a.getString(i))}catch(_:Exception){};return out}
+    private fun skip(d:Int){
+        val q=(prefs().getString("queue","")?:"").split(',').filter{it.isNotEmpty()&&Catalog.station(it).isNotEmpty()}.ifEmpty{allIds()}
+        val i=q.indexOf(id);val next=q[if(i<0)0 else Math.floorMod(i+d,q.size)]
+        ensureForeground();begin(next)
+    }
+    // Android Auto: raíz con Favoritas y Todas; cada radio se puede reproducir.
+    override fun onGetRoot(clientPackageName:String,clientUid:Int,rootHints:Bundle?)=BrowserRoot("root",null)
+    override fun onLoadChildren(parentId:String,result:Result<MutableList<android.media.browse.MediaBrowser.MediaItem>>){
+        fun folder(mid:String,title:String)=android.media.browse.MediaBrowser.MediaItem(MediaDescription.Builder().setMediaId(mid).setTitle(title).build(),android.media.browse.MediaBrowser.MediaItem.FLAG_BROWSABLE)
+        fun station(prefix:String,sid:String):android.media.browse.MediaBrowser.MediaItem?{val st=Catalog.station(sid);if(st.isEmpty())return null
+            return android.media.browse.MediaBrowser.MediaItem(MediaDescription.Builder().setMediaId("$prefix:$sid").setTitle(st[0]).setSubtitle(Catalog.qualityOf(sid)).build(),android.media.browse.MediaBrowser.MediaItem.FLAG_PLAYABLE)}
+        val items:MutableList<android.media.browse.MediaBrowser.MediaItem> = when(parentId){
+            "root"->mutableListOf(folder("fav","★ Favoritas"),folder("all","Todas las radios"))
+            "fav"->favIds().mapNotNull{station("fav",it)}.toMutableList()
+            "all"->allIds().mapNotNull{station("all",it)}.sortedBy{it.description.title.toString().lowercase()}.toMutableList()
+            else->mutableListOf()
+        }
+        result.sendResult(items)
+    }
     override fun onDestroy(){
         try{getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(network)}catch(_:RuntimeException){}
         unregisterReceiver(noisy);releasePlayer();if(focus)audio.abandonAudioFocusRequest(focusRequest)

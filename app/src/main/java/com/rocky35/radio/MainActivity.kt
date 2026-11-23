@@ -172,7 +172,11 @@ class MainActivity : Activity() {
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         val playing=row();toggle=button("▶",bg).apply{background=shape(blue);textSize=21f}
-        playing.addView(toggle,LinearLayout.LayoutParams(dp(50),dp(50)).apply{marginEnd=dp(10)})
+        val prevBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_prev);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Radio anterior";setOnClickListener{skip(-1)}}
+        val nextBtn=ImageButton(this).apply{setImageResource(R.drawable.ic_next);imageTintList=ColorStateList.valueOf(fg);background=shape(panel);contentDescription="Radio siguiente";setOnClickListener{skip(1)}}
+        playing.addView(prevBtn,LinearLayout.LayoutParams(dp(38),dp(50)).apply{marginEnd=dp(4)})
+        playing.addView(toggle,LinearLayout.LayoutParams(dp(50),dp(50)).apply{marginEnd=dp(4)})
+        playing.addView(nextBtn,LinearLayout.LayoutParams(dp(38),dp(50)).apply{marginEnd=dp(8)})
         val info=col();now=label("Elegí una emisora",16f,fg,true).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};status=label("Lista para escuchar",12f,muted).apply{maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END};info.addFull(now);info.addFull(status);playing.addView(info,LinearLayout.LayoutParams(0,-2,1f))
         favorite=button("☆",muted).apply{textSize=25f};playing.addView(favorite,LinearLayout.LayoutParams(dp(45),dp(46)));player.addFull(playing,54)
         val volRow=row();volRow.addView(ImageView(this).apply{setImageResource(R.drawable.ic_volume);imageTintList=ColorStateList.valueOf(muted);contentDescription="Volumen"},LinearLayout.LayoutParams(dp(22),dp(22)).apply{marginEnd=dp(4)});volume=SeekBar(this).apply{max=audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);progress=audio.getStreamVolume(AudioManager.STREAM_MUSIC);progressTintList=ColorStateList.valueOf(blue);thumbTintList=ColorStateList.valueOf(blue)}
@@ -210,6 +214,7 @@ class MainActivity : Activity() {
             for(i in r){val sid=Catalog.id(i);val f=down[sid]?:0;if(f in 1 until Health.HIDE||(f>=Health.HIDE&&sid==selected))a[n++]=i}
             rows=a.copyOf(n)
         }
+        RadioService.setQueue(this,rows.map{Catalog.id(it)})
         heading.text=if(onlyFavorites)"Mis favoritas" else "Emisoras"
         count.text=if(onlyFavorites&&favorites.isEmpty())"Tocá ☆ en una radio" else "${rows.size} radios"
         allTab.background=if(!onlyFavorites)allOn else allOff
@@ -221,6 +226,15 @@ class MainActivity : Activity() {
         val pos=list.firstVisiblePosition;val top=list.getChildAt(0)?.top?:0
         refresh();list.setSelectionFromTop(pos.coerceAtMost(maxOf(0,rows.size-1)),top)}
     private fun playing()=phase=="playing"||phase=="loading"
+    // ⏮ ⏭: recorren la lista que se está viendo (Todas o Favoritas, con su orden y filtros).
+    private fun skip(d:Int){
+        if(rows.isEmpty())return
+        val ids=rows.map{Catalog.id(it)};val i=ids.indexOf(selected)
+        val next=ids[if(i<0)(if(d>0)0 else ids.size-1) else Math.floorMod(i+d,ids.size)]
+        if(next==selected&&playing())return
+        listen(next)
+        val pos=rows.indexOfFirst{Catalog.id(it)==next};if(pos>=0&&(pos<list.firstVisiblePosition||pos>list.lastVisiblePosition))list.smoothScrollToPosition(pos)
+    }
     private fun listen(id:String){
         if(id==selected && playing()){startService(RadioService.pauseIntent(this));phase="paused"}
         else {selected=id;phase="loading";savePlay(id);val station=Catalog.station(id);now.text=station.firstOrNull()?:"";status.text="Conectando…";startForegroundService(RadioService.playIntent(this,id))}
