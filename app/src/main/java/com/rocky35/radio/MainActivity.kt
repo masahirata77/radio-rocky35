@@ -246,7 +246,7 @@ class MainActivity : Activity() {
     // Guardar: copia al portapapeles y archivo en Descargas, sin pantallas intermedias.
     private fun saveBackup(){
         val text=backupJson();RadioService.copyToClipboard(this,text)
-        val fname="radio-rocky35-favoritas_"+java.text.SimpleDateFormat("dd-MM-yy_HH-mm",java.util.Locale.US).format(java.util.Date())+".json"
+        val fname="favoritas_"+java.text.SimpleDateFormat("ddMMyy_HHmm",java.util.Locale.US).format(java.util.Date())+".json"
         var file=false
         try{
             if(Build.VERSION.SDK_INT>=29){
