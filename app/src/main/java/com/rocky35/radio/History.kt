@@ -22,6 +22,15 @@ object History {
         val f=file(c,y,m);if(!f.exists())return 0
         var n=0;f.inputStream().buffered().use{s->while(true){val b=s.read();if(b<0)break;if(b==10)n++}};return n
     }
+    // Borra las entradas que cumplan la condición, mes por mes; si un mes queda vacío, se borra el archivo.
+    fun delete(c:Context,pred:(Entry)->Boolean){
+        for((y,m) in months(c)){
+            val f=file(c,y,m);val lines=f.readLines()
+            val keep=lines.filter{l->val p=l.split('\t');val e=if(p.size<4)null else p[0].toLongOrNull()?.let{Entry(it,p[1].firstOrNull()?:'s',p[2],p[3])};e==null||!pred(e)}
+            if(keep.size==lines.size)continue
+            if(keep.isEmpty())f.delete() else f.writeText(keep.joinToString("\n",postfix="\n"))
+        }
+    }
     fun read(c:Context,y:Int,m:Int):List<Entry>{
         val f=file(c,y,m);if(!f.exists())return emptyList()
         return f.readLines().mapNotNull{l->val p=l.split('\t');if(p.size<4)null else p[0].toLongOrNull()?.let{Entry(it,p[1].firstOrNull()?:'s',p[2],p[3])}}.sortedByDescending{it.time}

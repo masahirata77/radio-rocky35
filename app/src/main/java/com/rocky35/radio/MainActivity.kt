@@ -173,7 +173,8 @@ class MainActivity : Activity() {
         }.apply {divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(6);adapter=this@MainActivity.adapter;cacheColorHint=Color.TRANSPARENT;isFastScrollEnabled=true;scrollBarStyle=View.SCROLLBARS_OUTSIDE_INSET;setPadding(0,0,dp(14),0);clipToPadding=false}
         root.addView(list,LinearLayout.LayoutParams(-1,0,1f))
         histList=ListView(this).apply{divider=android.graphics.drawable.ColorDrawable(Color.TRANSPARENT);dividerHeight=dp(3);cacheColorHint=Color.TRANSPARENT;visibility=View.GONE;adapter=histAdapter
-            setOnItemClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{if(!histOpen.remove(r.key))histOpen.add(r.key);hrows=buildHistory();histAdapter.notifyDataSetChanged()};is HRow.Item->histAction(r.e);else->{}}}}
+            setOnItemClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{if(!histOpen.remove(r.key))histOpen.add(r.key);reloadHistory(false)};is HRow.Item->histAction(r.e);is HRow.Clear->confirmDelete("todo el historial"){true};else->{}}}
+                setOnItemLongClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{confirmDelete(r.label.substringBefore("  (")){e->r.pred(e)};true};is HRow.Day->{confirmDelete(r.label){e->r.pred(e)};true};is HRow.Item->{confirmDelete("este renglón"){e->e.time==r.e.time};true};else->false}}}
         root.addView(histList,LinearLayout.LayoutParams(-1,0,1f))
         histTab.setOnClickListener{showHistory(true)}
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
@@ -251,9 +252,10 @@ class MainActivity : Activity() {
     private val histEntries=HashMap<String,List<History.Entry>>()
     private val histCounts=HashMap<String,Int>()
     private sealed class HRow{
-        class Head(val key:String,val label:String,val open:Boolean,val level:Int):HRow()
-        class Day(val label:String):HRow()
+        class Head(val key:String,val label:String,val open:Boolean,val level:Int,val pred:(History.Entry)->Boolean):HRow()
+        class Day(val label:String,val big:Boolean,val pred:(History.Entry)->Boolean):HRow()
         class Item(val e:History.Entry):HRow()
+        object Clear:HRow()
     }
     private var hrows:List<HRow> = emptyList()
     private val histAdapter by lazy{HistAdapter()}
@@ -276,28 +278,50 @@ class MainActivity : Activity() {
     private fun hhmm(t:Long):String{val c=cal(t);return String.format(java.util.Locale.US,"%02d:%02d",c.get(java.util.Calendar.HOUR_OF_DAY),c.get(java.util.Calendar.MINUTE))}
     private fun monthCount(y:Int,m:Int)=histCounts.getOrPut("$y-$m"){History.count(this,y,m)}
     private fun monthEntries(y:Int,m:Int)=histEntries.getOrPut("$y-$m"){History.read(this,y,m)}
+    // Hoy y Ayer abiertos arriba; después las semanas del mes, los meses del año y los años anteriores (plegados).
     private fun buildHistory():List<HRow>{
         val now=System.currentTimeMillis();val c=cal(now);val cy=c.get(java.util.Calendar.YEAR);val cm=c.get(java.util.Calendar.MONTH)+1
-        if(!histOpenInit){histOpenInit=true;histOpen.add("y$cy");histOpen.add("m$cy-$cm");histOpen.add("w"+weekKey(now))}
+        val today=dayKey(now);val yest=dayKey(now-86_400_000L)
+        fun recent(e:History.Entry)=dayKey(e.time).let{it==today||it==yest}
         val out=ArrayList<HRow>();val months=History.months(this)
-        for(y in months.map{it.first}.distinct()){
-            val ms=months.filter{it.first==y};val yk="y$y";val yOpen=histOpen.contains(yk)
-            out.add(HRow.Head(yk,"$y  (${ms.sumOf{monthCount(it.first,it.second)}})",yOpen,0))
-            if(!yOpen)continue
-            for((_,m) in ms){
-                val mk="m$y-$m";val mOpen=histOpen.contains(mk)
-                out.add(HRow.Head(mk,"${monthNames[m-1]}  (${monthCount(y,m)})",mOpen,1))
-                if(!mOpen)continue
-                for((wk,we) in monthEntries(y,m).groupBy{weekKey(it.time)}){
-                    val wOpen=histOpen.contains("w$wk")
-                    out.add(HRow.Head("w$wk","${weekLabel(we.first().time)}  (${we.size})",wOpen,2))
-                    if(!wOpen)continue
-                    var last=""
-                    for(e in we){val d=dayLabel(e.time);if(d!=last){last=d;out.add(HRow.Day(d))};out.add(HRow.Item(e))}
-                }
+        val near=months.take(2).flatMap{monthEntries(it.first,it.second)}.sortedByDescending{it.time}
+        for(k in listOf(today,yest)){
+            val es=near.filter{dayKey(it.time)==k};if(es.isEmpty())continue
+            out.add(HRow.Day(dayLabel(es[0].time),true){e->dayKey(e.time)==k});es.forEach{out.add(HRow.Item(it))}
+        }
+        fun weeks(es:List<History.Entry>,level:Int){
+            for((wk,we) in es.groupBy{weekKey(it.time)}){
+                val open=histOpen.contains("w$wk")
+                out.add(HRow.Head("w$wk","${weekLabel(we.first().time)}  (${we.size})",open,level){e->weekKey(e.time)==wk&&!recent(e)})
+                if(!open)continue
+                var last="";for(e in we){val d=dayLabel(e.time);if(d!=last){last=d;val dk=dayKey(e.time);out.add(HRow.Day(d,false){x->dayKey(x.time)==dk})};out.add(HRow.Item(e))}
             }
         }
+        fun month(y:Int,m:Int,level:Int){
+            val es=monthEntries(y,m).filterNot(::recent);if(es.isEmpty())return
+            val key="m$y-$m";val open=histOpen.contains(key)
+            out.add(HRow.Head(key,"${monthNames[m-1]} $y  (${es.size})",open,level){e->cal(e.time).let{it.get(java.util.Calendar.YEAR)==y&&it.get(java.util.Calendar.MONTH)+1==m}&&!recent(e)})
+            if(open)weeks(es,level+1)
+        }
+        weeks(monthEntries(cy,cm).filterNot(::recent),0)
+        for((y,m) in months.filter{it.first==cy&&it.second!=cm})month(y,m,0)
+        for(y in months.map{it.first}.filter{it<cy}.distinct()){
+            val ms=months.filter{it.first==y};val key="y$y";val open=histOpen.contains(key)
+            out.add(HRow.Head(key,"$y  (${ms.sumOf{monthCount(it.first,it.second)}})",open,0){e->cal(e.time).get(java.util.Calendar.YEAR)==y&&!recent(e)})
+            if(open)for((_,m) in ms)month(y,m,1)
+        }
+        if(out.isNotEmpty())out.add(HRow.Clear)
         return out
+    }
+    private fun reloadHistory(fromDisk:Boolean){
+        if(fromDisk){histEntries.clear();histCounts.clear()}
+        val first=histList.firstVisiblePosition;val top=histList.getChildAt(0)?.top?:0
+        hrows=buildHistory();histAdapter.notifyDataSetChanged();histList.setSelectionFromTop(first.coerceAtMost(maxOf(0,hrows.size-1)),top);refresh()
+    }
+    private fun confirmDelete(what:String,pred:(History.Entry)->Boolean){
+        android.app.AlertDialog.Builder(this).setTitle("Borrar").setMessage("¿Borrar $what del historial? No se puede deshacer.")
+            .setPositiveButton("Borrar"){_,_->Thread{try{History.delete(this,pred)}catch(_:Exception){};runOnUiThread{reloadHistory(true)}}.start()}
+            .setNegativeButton("Cancelar",null).show()
     }
     private fun showHistory(on:Boolean){
         if(!::histList.isInitialized)return
@@ -310,28 +334,36 @@ class MainActivity : Activity() {
     private fun histAction(e:History.Entry){
         val copyText=if(e.type=='p')"${e.station} · ${e.text}" else e.text
         val q=if(e.type=='p')"${e.station} ${e.text.substringBefore(" · ")}" else e.text
-        android.app.AlertDialog.Builder(this).setTitle(e.text).setItems(arrayOf("Copiar","Buscar en el navegador")){_,w->
-            if(w==0)RadioService.copyToClipboard(this,copyText)
-            else try{startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))).addCategory(Intent.CATEGORY_BROWSABLE))}catch(_:Exception){}
+        android.app.AlertDialog.Builder(this).setTitle(e.text).setItems(arrayOf("Copiar","Buscar en el navegador","Borrar")){_,w->
+            when(w){
+                0->RadioService.copyToClipboard(this,copyText)
+                1->try{startActivity(Intent(Intent.ACTION_VIEW,android.net.Uri.parse("https://www.google.com/search?q="+android.net.Uri.encode(q))).addCategory(Intent.CATEGORY_BROWSABLE))}catch(_:Exception){}
+                else->confirmDelete("este renglón"){x->x.time==e.time}
+            }
         }.show()
     }
     private inner class HistAdapter:BaseAdapter(){
         override fun getCount()=hrows.size
         override fun getItem(p:Int):Any=hrows[p]
         override fun getItemId(p:Int)=p.toLong()
-        override fun getViewTypeCount()=3
-        override fun getItemViewType(p:Int)=when(hrows[p]){is HRow.Head->0;is HRow.Day->1;is HRow.Item->2}
+        override fun getViewTypeCount()=4
+        override fun getItemViewType(p:Int)=when(hrows[p]){is HRow.Head->0;is HRow.Day->1;is HRow.Item->2;HRow.Clear->3}
         override fun getView(p:Int,cv:View?,parent:ViewGroup?):View=when(val r=hrows[p]){
             is HRow.Head->{
                 val t=(cv as? TextView)?:label("",15f,fg,true).apply{background=shape(panel,10)}
                 t.text=(if(r.open)"▾  " else "▸  ")+r.label
-                t.textSize=when(r.level){0->17f;1->16f;else->14f}
+                t.textSize=if(r.level==0)16f else 14f
                 t.setPadding(dp(12+r.level*16),dp(11),dp(12),dp(11));t
             }
-            is HRow.Day->{val t=(cv as? TextView)?:label("",12f,muted,true).apply{setPadding(dp(60),dp(10),dp(8),dp(2))};t.text=r.label;t}
+            is HRow.Day->{
+                val t=(cv as? TextView)?:label("",12f,muted,true)
+                t.text=r.label
+                if(r.big){t.textSize=16f;t.setTextColor(fg);t.setPadding(dp(8),dp(12),dp(8),dp(4))}else{t.textSize=12f;t.setTextColor(muted);t.setPadding(dp(56),dp(10),dp(8),dp(2))}
+                t
+            }
             is HRow.Item->{
                 val v=(cv as? LinearLayout)?:row().apply{
-                    setPadding(dp(56),dp(6),dp(8),dp(6))
+                    setPadding(dp(8),dp(6),dp(8),dp(6))
                     addView(label("",13f,muted).apply{tag="h"},LinearLayout.LayoutParams(dp(48),-2))
                     val c=col();c.addView(label("",15f,fg).apply{tag="t";maxLines=2;ellipsize=android.text.TextUtils.TruncateAt.END});c.addView(label("",12f,muted).apply{tag="s";maxLines=1;ellipsize=android.text.TextUtils.TruncateAt.END});addView(c,LinearLayout.LayoutParams(0,-2,1f))
                 }
@@ -339,6 +371,10 @@ class MainActivity : Activity() {
                 v.findViewWithTag<TextView>("t").text=(if(r.e.type=='p')"🎙 " else "♪ ")+r.e.text
                 v.findViewWithTag<TextView>("s").text=r.e.station
                 v
+            }
+            HRow.Clear->{
+                val t=(cv as? TextView)?:label("Borrar todo el historial",14f,Color.rgb(255,150,150),true).apply{gravity=Gravity.CENTER;background=shape(panel,10,line)}
+                t.setPadding(dp(12),dp(12),dp(12),dp(12));t
             }
         }
     }

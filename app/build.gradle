@@ -6,8 +6,8 @@ android {
         applicationId 'com.rocky35.radio'
         minSdk 26
         targetSdk 37
-        versionCode 28
-        versionName '0.1.28'
+        versionCode 29
+        versionName '0.1.29'
     }
     packaging { resources { excludes += ['kotlin/**', 'META-INF/*.kotlin_module', 'META-INF/*.version'] } }
     // Clave de publicación fuera del repositorio (~/.android-keys). Si no existe (por ejemplo en F-Droid), release queda sin firmar.
