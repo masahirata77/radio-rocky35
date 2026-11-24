@@ -182,7 +182,7 @@ class MainActivity : Activity() {
             setOnItemClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{if(!histOpen.remove(r.key))histOpen.add(r.key);reloadHistory(false)};is HRow.Item->histAction(r.e);is HRow.Clear->confirmDelete("todo el historial"){true};else->{}}}
                 setOnItemLongClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{confirmDelete(r.label.substringBefore("  (")){e->r.pred(e)};true};is HRow.Day->{confirmDelete(r.label){e->r.pred(e)};true};is HRow.Item->{confirmDelete("este renglón"){e->e.time==r.e.time};true};else->false}}}
         root.addView(histList,LinearLayout.LayoutParams(-1,0,1f))
-        histTab.setOnClickListener{showHistory(true)}
+        histTab.setOnClickListener{if(showingHistory){tabPos.remove("h");histList.setSelection(0)} else {saveTabPos();showHistory(true)}}
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         // Renglón 1: radio y lo que suena + estrellita.
         val playing=row()
@@ -223,8 +223,48 @@ class MainActivity : Activity() {
             val last=prefs.getString("last","")?:"";val st=if(last.isEmpty())emptyArray() else Catalog.station(last)
             if(st.isNotEmpty()){selected=last;now.text=st[0];message="Tocá ▶ para escuchar";showStatus("");updatePlayer();adapter.notifyDataSetChanged()}
         }
+        reopenTab()
     }
-    private fun mode(f:Boolean){showHistory(false);handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh();if(rows.isNotEmpty())list.setSelection(0)}
+    // Al abrir: misma pestaña y mismo lugar que al cerrar; si hay una radio elegida y no se ve, la lista la muestra.
+    private fun reopenTab(){
+        try{for(e in (prefs.getString("tabPos","")?:"").split(',')){val a=e.split(':');if(a.size==3)tabPos[a[0]]=a[1].toInt() to a[2].toInt()}}catch(_:Exception){}
+        when(prefs.getString("tab","a")){
+            "f"->{onlyFavorites=true;refresh();restoreTabPos()}
+            "h"->showHistory(true)
+            else->restoreTabPos()
+        }
+        list.post{showSelected()}
+    }
+    private fun showSelected(){
+        if(showingHistory||selected.isEmpty())return
+        val pos=rows.indexOfFirst{Catalog.id(it)==selected};if(pos<0)return
+        if(pos<list.firstVisiblePosition||pos>list.lastVisiblePosition)list.setSelectionFromTop(pos,list.height/3)
+    }
+    private fun persistTabs(){
+        saveTabPos()
+        prefs.edit().putString("tab",tabKey()).putString("tabPos",tabPos.entries.joinToString(","){"${it.key}:${it.value.first}:${it.value.second}"}).apply()
+    }
+    // Cada pestaña (Todas, Favoritas, Historial) recuerda hasta dónde la bajaste.
+    // Tocar la pestaña en la que ya estás vuelve al principio.
+    private val tabPos=HashMap<String,Pair<Int,Int>>()
+    private fun tabKey()=if(showingHistory)"h" else if(onlyFavorites)"f" else "a"
+    private fun tabList():ListView=if(showingHistory)histList else list
+    private fun saveTabPos(){
+        if(!::histList.isInitialized)return
+        val lv=tabList();if((lv.adapter?.count?:0)==0)return
+        tabPos[tabKey()]=lv.firstVisiblePosition to (lv.getChildAt(0)?.top?:0)
+    }
+    private fun restoreTabPos(){
+        val lv=tabList();val n=lv.adapter?.count?:0;if(n==0)return
+        val p=tabPos[tabKey()]
+        if(p==null)lv.setSelection(0) else lv.setSelectionFromTop(p.first.coerceAtMost(n-1),p.second)
+    }
+    private fun mode(f:Boolean){
+        val same=!showingHistory&&onlyFavorites==f
+        saveTabPos()
+        showHistory(false);handler.removeCallbacks(searchRefresh);onlyFavorites=f;changing=true;search.setText("");region.setSelection(0);changing=false;refresh()
+        if(same){tabPos.remove(tabKey());if(rows.isNotEmpty())list.setSelection(0)} else restoreTabPos()
+    }
     private fun refresh(){
         if(!::adapter.isInitialized||detached)return
         rows=Catalog.filterIndices(search.text.toString(),departments.getOrElse(region.selectedItemPosition){""},onlyFavorites,if(onlyFavorites)favorites.toTypedArray() else emptyArray())
@@ -334,7 +374,7 @@ class MainActivity : Activity() {
         showingHistory=on
         list.visibility=if(on)View.GONE else View.VISIBLE
         histList.visibility=if(on)View.VISIBLE else View.GONE
-        if(on){histEntries.clear();histCounts.clear();hrows=buildHistory();histAdapter.notifyDataSetChanged();histList.setSelection(0)}
+        if(on){histEntries.clear();histCounts.clear();hrows=buildHistory();histAdapter.notifyDataSetChanged();restoreTabPos()}
         refresh()
     }
     private fun histAction(e:History.Entry){
@@ -557,6 +597,7 @@ class MainActivity : Activity() {
         }catch(e:Exception){false}finally{try{c?.disconnect()}catch(_:Exception){}}
     }
     override fun onStop(){
+        persistTabs()
         RadioService.removeObserver(playbackObserver)
         contentResolver.unregisterContentObserver(volumeObserver)
         audio.unregisterAudioDeviceCallback(audioDevices)
