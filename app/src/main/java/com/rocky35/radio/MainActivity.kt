@@ -182,6 +182,7 @@ class MainActivity : Activity() {
             setOnItemClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{if(!histOpen.remove(r.key))histOpen.add(r.key);reloadHistory(false)};is HRow.Item->histAction(r.e);is HRow.Clear->confirmDelete("todo el historial"){true};else->{}}}
                 setOnItemLongClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{confirmDelete(r.label.substringBefore("  (")){e->r.pred(e)};true};is HRow.Day->{confirmDelete(r.label){e->r.pred(e)};true};is HRow.Item->{confirmDelete("este renglón"){e->e.time==r.e.time};true};else->false}}}
         root.addView(histList,LinearLayout.LayoutParams(-1,0,1f))
+        swipeTabs(list);swipeTabs(histList)
         histTab.setOnClickListener{if(showingHistory){tabPos.remove("h");histList.setSelection(0)} else {saveTabPos();showHistory(true)}}
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         // Renglón 1: radio y lo que suena + estrellita.
@@ -258,6 +259,27 @@ class MainActivity : Activity() {
         val lv=tabList();val n=lv.adapter?.count?:0;if(n==0)return
         val p=tabPos[tabKey()]
         if(p==null)lv.setSelection(0) else lv.setSelectionFromTop(p.first.coerceAtMost(n-1),p.second)
+    }
+    // Deslizar el dedo hacia la izquierda pasa a la pestaña de la derecha (Todas → Favoritas → Historial),
+    // y hacia la derecha vuelve. El borde derecho queda libre para la barra de desplazamiento rápido.
+    private fun goTab(k:String){
+        if(k==tabKey())return
+        when(k){"a"->mode(false);"f"->mode(true);else->{saveTabPos();showHistory(true)}}
+    }
+    private fun swipeTabs(lv:ListView){
+        val minDist=dp(90).toFloat();val minVel=dp(350).toFloat();val edge=dp(44)
+        val g=android.view.GestureDetector(this,object:android.view.GestureDetector.SimpleOnGestureListener(){
+            override fun onFling(e1:MotionEvent?,e2:MotionEvent,vx:Float,vy:Float):Boolean{
+                if(e1==null||e1.x>lv.width-edge)return false
+                val dx=e2.x-e1.x;val dy=e2.y-e1.y
+                if(Math.abs(dx)<minDist||Math.abs(dx)<Math.abs(dy)*1.6f||Math.abs(vx)<minVel)return false
+                val order=listOf("a","f","h");val i=order.indexOf(tabKey())
+                val j=if(dx<0)i+1 else i-1
+                if(j in order.indices){goTab(order[j]);return true}
+                return false
+            }
+        })
+        lv.setOnTouchListener{_,ev->g.onTouchEvent(ev);false}
     }
     private fun mode(f:Boolean){
         val same=!showingHistory&&onlyFavorites==f
