@@ -264,9 +264,18 @@ class RadioService : android.service.media.MediaBrowserService() {
         if(k==lastMeta)return;lastMeta=k
         session.setMetadata(MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE,t).putString(MediaMetadata.METADATA_KEY_ARTIST,sub).putString(MediaMetadata.METADATA_KEY_ALBUM,name).build())
     }
+    // Anota en el historial cada tema o programa nuevo mientras suena.
+    private var lastLogged=""
+    private fun logHistory(){
+        if(phase!="playing")return
+        val (t,txt)=when{song.isNotEmpty()->'s' to song;program.isNotEmpty()&&program!="🎙 Selección musical"->'p' to program.removePrefix("🎙 ");else->return}
+        val k="$id|$t|$txt";if(k==lastLogged)return;lastLogged=k
+        val st=name;val ctx=applicationContext
+        try{io.execute{try{History.append(ctx,t,st,txt)}catch(_:Exception){}}}catch(_:Exception){}
+    }
     private fun publish(p:String,text:String){
         updateMetadata()
-        phase=p;message=text;emit(Snapshot(id,name,p,text,if(p=="playing")song.ifEmpty{program} else ""))
+        phase=p;message=text;logHistory();emit(Snapshot(id,name,p,text,if(p=="playing")song.ifEmpty{program} else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
         session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP or PlaybackState.ACTION_SKIP_TO_NEXT or PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
