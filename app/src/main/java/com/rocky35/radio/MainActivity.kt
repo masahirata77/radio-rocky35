@@ -183,7 +183,7 @@ class MainActivity : Activity() {
                 setOnItemLongClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{confirmDelete(r.label.substringBefore("  (")){e->r.pred(e)};true};is HRow.Day->{confirmDelete(r.label){e->r.pred(e)};true};is HRow.Item->{confirmDelete("este renglón"){e->e.time==r.e.time};true};else->false}}}
         root.addView(histList,LinearLayout.LayoutParams(-1,0,1f))
         swipeTabs(list);swipeTabs(histList)
-        histTab.setOnClickListener{if(showingHistory){tabPos.remove("h");histList.setSelection(0)} else {saveTabPos();showHistory(true)}}
+        histTab.setOnClickListener{if(showingHistory){tabPos.remove("h");histList.setSelection(0)} else goTab("h")}
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         // Renglón 1: radio y lo que suena + estrellita.
         val playing=row()
@@ -211,7 +211,7 @@ class MainActivity : Activity() {
         if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!prefs.getBoolean("askedNotif",false)){prefs.edit().putBoolean("askedNotif",true).apply();requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),35)}
         search.addTextChangedListener(object:TextWatcher{override fun beforeTextChanged(s:CharSequence?,start:Int,count:Int,after:Int){};override fun onTextChanged(s:CharSequence?,start:Int,before:Int,count:Int){if(!changing)scheduleSearch()};override fun afterTextChanged(s:Editable?) {}})
         region.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{override fun onItemSelected(parent:AdapterView<*>?,v:View?,position:Int,id:Long){if(!changing)refresh()};override fun onNothingSelected(parent:AdapterView<*>?){}}
-        allTab.setOnClickListener{mode(false)};favTab.setOnClickListener{mode(true)}
+        allTab.setOnClickListener{if(tabKey()=="a")mode(false) else goTab("a")};favTab.setOnClickListener{if(tabKey()=="f")mode(true) else goTab("f")}
         toggle.setOnClickListener{if(selected.isNotEmpty())listen(selected) else if(rows.isNotEmpty())listen(Catalog.id(rows[0]))}
         favorite.setOnClickListener{if(selected.isNotEmpty())flip(selected)}
         volume.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
@@ -263,8 +263,13 @@ class MainActivity : Activity() {
     // Deslizar el dedo hacia la izquierda pasa a la pestaña de la derecha (Todas → Favoritas → Historial),
     // y hacia la derecha vuelve. El borde derecho queda libre para la barra de desplazamiento rápido.
     private fun goTab(k:String){
-        if(k==tabKey())return
+        val cur=tabKey();if(k==cur)return
+        val order="afh";val dir=if(order.indexOf(k)>order.indexOf(cur))1f else -1f
         when(k){"a"->mode(false);"f"->mode(true);else->{saveTabPos();showHistory(true)}}
+        // Animación: la lista nueva entra deslizándose desde el lado hacia donde vas.
+        val lv=tabList();lv.animate().cancel()
+        lv.translationX=dir*lv.width*0.35f;lv.alpha=0.3f
+        lv.animate().translationX(0f).alpha(1f).setDuration(220).setInterpolator(android.view.animation.DecelerateInterpolator()).start()
     }
     private fun swipeTabs(lv:ListView){
         val minDist=dp(90).toFloat();val minVel=dp(350).toFloat();val edge=dp(44)
