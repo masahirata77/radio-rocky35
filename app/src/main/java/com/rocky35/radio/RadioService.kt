@@ -31,6 +31,11 @@ class RadioService : android.service.media.MediaBrowserService() {
             c.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Tema",text))
             if(Build.VERSION.SDK_INT<33)android.widget.Toast.makeText(c,"Copiado: $text",android.widget.Toast.LENGTH_SHORT).show()
         }
+        // Bytes de audio que pasan por el puente local (para mostrar kB/s sin contar el tráfico interno).
+        @Volatile private var proxyBytes=0L
+        @Volatile var proxyActive=false
+        fun addBytes(n:Int){proxyBytes+=n}
+        fun rxBytes(uid:Int):Long=if(proxyActive)proxyBytes else android.net.TrafficStats.getUidRxBytes(uid)
         fun observe(listener:(Snapshot)->Unit) { listeners.add(listener);listener(state) }
         fun removeObserver(listener:(Snapshot)->Unit) { listeners.remove(listener) }
         private fun emit(snapshot:Snapshot) {
@@ -84,6 +89,7 @@ class RadioService : android.service.media.MediaBrowserService() {
     private var round = 0
     private var song = ""
     private var titleMisses = 0
+    private var proxy: IcyProxy? = null
     private val io = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var program = ""
     private val programTick = object:Runnable{override fun run(){
@@ -95,10 +101,16 @@ class RadioService : android.service.media.MediaBrowserService() {
     private val titleTick = object:Runnable{override fun run(){
         if(phase!="playing"&&phase!="loading")return
         handler.postDelayed(this,30000)
-        if(phase!="playing"||titleMisses>=3)return
+        if(phase!="playing"||titleMisses>=3||proxy!=null)return
         val u=urls.getOrNull(index)?:return;val sid=id;val st=name
         try{io.execute{val t=fetchTitle(u);handler.post{applyTitle(sid,st,t)}}}catch(_:RuntimeException){}
     }}
+    // Título que llega dentro del mismo audio: se aplica al instante.
+    private fun applyInline(sid:String,t:String){
+        if(sid!=id)return
+        if(!usefulTitle(t,name)){if(song.isNotEmpty()){song="";publish(phase,message)};return}
+        if(t!=song){song=t;publish(phase,message)}
+    }
     private fun applyTitle(sid:String,st:String,t:String?){
         if(sid!=id)return
         if(!usefulTitle(t,st)){titleMisses++;if(titleMisses>=3&&song.isNotEmpty()){song="";publish(phase,message)};return}
@@ -197,7 +209,10 @@ class RadioService : android.service.media.MediaBrowserService() {
                 }
                 false
             }
-            p.setDataSource(urls[index]);p.prepareAsync();timeout=Runnable{fail(p)};handler.postDelayed(timeout!!,20000)
+            val src=urls[index];val sid=id
+            val px=if(src.contains(".m3u8",true))null else try{IcyProxy(src){t->handler.post{applyInline(sid,t)}}.also{it.start()}}catch(_:Exception){null}
+            proxy=px;proxyActive=px!=null
+            p.setDataSource(px?.localUrl?:src);p.prepareAsync();timeout=Runnable{fail(p)};handler.postDelayed(timeout!!,20000)
         }catch(e:Exception){fail(p)}
     }
     private fun fail(p:MediaPlayer){
@@ -211,7 +226,7 @@ class RadioService : android.service.media.MediaBrowserService() {
         val r=Runnable{retry=null;connect()};retry=r;handler.postDelayed(r,wait)
     }
     private fun clearTimeout(){timeout?.let{handler.removeCallbacks(it)};timeout=null}
-    private fun releasePlayer(){clearTimeout();retry?.let{handler.removeCallbacks(it)};retry=null;val old=player;player=null;prepared=false;try{old?.release()}catch(_:RuntimeException){}}
+    private fun releasePlayer(){proxy?.close();proxy=null;proxyActive=false;clearTimeout();retry?.let{handler.removeCallbacks(it)};retry=null;val old=player;player=null;prepared=false;try{old?.release()}catch(_:RuntimeException){}}
     private fun focusChanged(change:Int){
         when(change){
             AudioManager.AUDIOFOCUS_LOSS->pausePlayback()

@@ -474,9 +474,9 @@ class MainActivity : Activity() {
     private fun updateRate(){
         if(!::status.isInitialized)return
         if(phase!="playing"){lastRx=-1;return}
-        val rx=TrafficStats.getUidRxBytes(Process.myUid());val now=SystemClock.elapsedRealtime()
+        val rx=RadioService.rxBytes(Process.myUid());val now=SystemClock.elapsedRealtime()
         if(rx<0)return
-        if(lastRx<0){lastRx=rx;lastAt=now;return}
+        if(lastRx<0||rx<lastRx){lastRx=rx;lastAt=now;return}
         if(now-lastAt<3000)return
         showStatus(String.format("%.1f kB/s",(rx-lastRx)*1000.0/1024/(now-lastAt)))
         lastRx=rx;lastAt=now
