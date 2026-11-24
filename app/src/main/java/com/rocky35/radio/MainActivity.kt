@@ -58,7 +58,7 @@ class MainActivity : Activity() {
     private var changing = false
     private var draggingVolume = false
     private val prefs by lazy { getSharedPreferences("radio", MODE_PRIVATE) }
-    private val sortNames=arrayOf("Nombre","Popularidad","Últimas escuchadas","Más escuchadas")
+    private val sortNames=arrayOf("Nombre","Popularidad","Últimas escuchadas","Más escuchadas","Calidad de audio")
     private var sortMode=0
     private var sortReverse=false
     private lateinit var sortBtn: Button
@@ -78,11 +78,17 @@ class MainActivity : Activity() {
             1->compareByDescending<Int>{Catalog.popularity(it)}
             2->compareByDescending<Int>{sp[Catalog.id(it)]?.get(1)?:0L}
             3->compareByDescending<Int>{sp[Catalog.id(it)]?.get(0)?:0L}
+            4->compareByDescending<Int>{qualityScore(Catalog.quality(it))}
             else->Comparator{a,b->Catalog.compareNames(a,b)}
         }
         val tie=Comparator<Int>{a,b->Catalog.compareNames(a,b)}
         val full=c.then(tie)
         return r.sortedWith(if(sortReverse)full.reversed() else full).toIntArray()
+    }
+    // Calidad: kbps del stream; AAC/Opus rinden más por kbps que MP3.
+    private fun qualityScore(q:String):Int{
+        val k=Regex("(\\d+)\\s*kbps").find(q)?.groupValues?.get(1)?.toIntOrNull()?:0
+        val u=q.uppercase();return when{"OPUS" in u->k*2;"AAC" in u->k*3/2;else->k}
     }
     private fun updateSortButtons(){sortBtn.text="⇅ "+sortNames[sortMode];dirBtn.text=if(sortReverse)"↑" else "↓"}
     private val playbackObserver: (RadioService.Companion.Snapshot)->Unit = { syncPlayback(it) }
@@ -149,10 +155,10 @@ class MainActivity : Activity() {
         region.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_item,names).apply {setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)}
         tools.addFull(region,46,8)
         val tabs=row();allTab=button("Todas");favTab=button("★ Favoritas");histTab=button("Historial");tabs.addView(allTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(favTab,LinearLayout.LayoutParams(0,dp(44),1f).apply{marginEnd=dp(5)});tabs.addView(histTab,LinearLayout.LayoutParams(0,dp(44),1f));root.addFull(tabs,44,6)
-        sortMode=prefs.getInt("sortMode",0).coerceIn(0,3);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
+        sortMode=prefs.getInt("sortMode",0).coerceIn(0,4);sortReverse=prefs.getBoolean("sortReverse",false);loadPlays()
         val sorts=row();sortBtn=button("",fg).apply{background=shape(panel,12,line);contentDescription="Cambiar orden"};dirBtn=button("",fg).apply{background=shape(panel,12,line);textSize=18f;contentDescription="Invertir orden"}
         sorts.addView(sortBtn,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});sorts.addView(dirBtn,LinearLayout.LayoutParams(dp(56),dp(40)));tools.addFull(sorts,40,9);val copies=row();val saveB=button("Guardar copia",fg).apply{setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_save,0,0,0);compoundDrawableTintList=ColorStateList.valueOf(fg);compoundDrawablePadding=dp(6);setPadding(dp(12),0,dp(12),0);textSize=13f;background=shape(panel,12,line);setOnClickListener{saveBackup()}};val loadB=button("Restaurar copia",fg).apply{setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_restore,0,0,0);compoundDrawableTintList=ColorStateList.valueOf(fg);compoundDrawablePadding=dp(6);setPadding(dp(12),0,dp(12),0);textSize=13f;background=shape(panel,12,line);setOnClickListener{restoreBackup()}};copies.addView(saveB,LinearLayout.LayoutParams(0,dp(40),1f).apply{marginEnd=dp(5)});copies.addView(loadB,LinearLayout.LayoutParams(0,dp(40),1f));tools.addFull(copies,40,9)
-        sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%4;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
+        sortBtn.setOnClickListener{sortPlays=null;sortMode=(sortMode+1)%5;prefs.edit().putInt("sortMode",sortMode).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         dirBtn.setOnClickListener{sortPlays=null;sortReverse=!sortReverse;prefs.edit().putBoolean("sortReverse",sortReverse).apply();updateSortButtons();refresh();if(rows.isNotEmpty())list.setSelection(0)}
         updateSortButtons()
         val summary=row();heading=label("Emisoras",17f,fg,true);count=label("",13f,muted);summary.addView(heading,LinearLayout.LayoutParams(0,-2,1f));summary.addView(count);root.addFull(summary,26,5)
@@ -454,7 +460,7 @@ class MainActivity : Activity() {
         selected=snap.id;phase=snap.phase
         if(now.text!=snap.name)now.text=snap.name
         if(message!=snap.message){message=snap.message;lastRx=-1;showStatus("")}
-        if(song!=snap.title){song=snap.title;showStatus(lastRate)}
+        if(song!=snap.title){song=snap.title;showStatus(lastRate);if(showingHistory)handler.postDelayed({if(showingHistory)reloadHistory(true)},800)}
         updateCopy()
         if(snap.phase=="playing"&&down.containsKey(selected)){down.remove(selected);refresh()}
         if(change){adapter.notifyDataSetChanged();updatePlayer()}
