@@ -182,7 +182,6 @@ class MainActivity : Activity() {
             setOnItemClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{if(!histOpen.remove(r.key))histOpen.add(r.key);reloadHistory(false)};is HRow.Item->histAction(r.e);is HRow.Clear->confirmDelete("todo el historial"){true};else->{}}}
                 setOnItemLongClickListener{_,_,pos,_->when(val r=hrows.getOrNull(pos)){is HRow.Head->{confirmDelete(r.label.substringBefore("  (")){e->r.pred(e)};true};is HRow.Day->{confirmDelete(r.label){e->r.pred(e)};true};is HRow.Item->{confirmDelete("este renglón"){e->e.time==r.e.time};true};else->false}}}
         root.addView(histList,LinearLayout.LayoutParams(-1,0,1f))
-        swipeTabs(list);swipeTabs(histList)
         histTab.setOnClickListener{if(showingHistory){tabPos.remove("h");histList.setSelection(0)} else goTab("h")}
         val player=col().apply {background=shape(Color.rgb(32,46,66));setPadding(dp(10),dp(8),dp(10),dp(5))}
         // Renglón 1: radio y lo que suena + estrellita.
@@ -271,20 +270,46 @@ class MainActivity : Activity() {
         lv.translationX=dir*lv.width*0.35f;lv.alpha=0.3f
         lv.animate().translationX(0f).alpha(1f).setDuration(220).setInterpolator(android.view.animation.DecelerateInterpolator()).start()
     }
-    private fun swipeTabs(lv:ListView){
-        val minDist=dp(90).toFloat();val minVel=dp(350).toFloat();val edge=dp(44)
-        val g=android.view.GestureDetector(this,object:android.view.GestureDetector.SimpleOnGestureListener(){
-            override fun onFling(e1:MotionEvent?,e2:MotionEvent,vx:Float,vy:Float):Boolean{
-                if(e1==null||e1.x>lv.width-edge)return false
-                val dx=e2.x-e1.x;val dy=e2.y-e1.y
-                if(Math.abs(dx)<minDist||Math.abs(dx)<Math.abs(dy)*1.6f||Math.abs(vx)<minVel)return false
-                val order=listOf("a","f","h");val i=order.indexOf(tabKey())
-                val j=if(dx<0)i+1 else i-1
-                if(j in order.indices){goTab(order[j]);return true}
-                return false
+    // Gesto entre pestañas, detectado antes que las filas y botones: si el dedo se mueve en horizontal,
+    // se cancela el toque de la fila y la lista sigue al dedo; al soltar, cambia de pestaña o vuelve a su lugar.
+    private var swX=0f;private var swY=0f;private var swTrack=false;private var swOn=false
+    override fun dispatchTouchEvent(ev:MotionEvent):Boolean{
+        if(!::histList.isInitialized)return super.dispatchTouchEvent(ev)
+        val lv=tabList()
+        when(ev.actionMasked){
+            MotionEvent.ACTION_DOWN->{
+                swOn=false;swX=ev.rawX;swY=ev.rawY
+                val loc=IntArray(2);lv.getLocationOnScreen(loc)
+                swTrack=lv.visibility==View.VISIBLE&&ev.rawY>=loc[1]&&ev.rawY<=loc[1]+lv.height&&ev.rawX>=loc[0]&&ev.rawX<=loc[0]+lv.width-dp(44)
             }
-        })
-        lv.setOnTouchListener{_,ev->g.onTouchEvent(ev);false}
+            MotionEvent.ACTION_MOVE->if(swTrack){
+                val dx=ev.rawX-swX;val dy=ev.rawY-swY
+                if(!swOn){
+                    if(Math.abs(dy)>dp(20)&&Math.abs(dy)>Math.abs(dx))swTrack=false
+                    else if(Math.abs(dx)>dp(22)&&Math.abs(dx)>Math.abs(dy)*1.3f){
+                        swOn=true
+                        val c=MotionEvent.obtain(ev);c.action=MotionEvent.ACTION_CANCEL;super.dispatchTouchEvent(c);c.recycle()
+                    }
+                }
+                if(swOn){
+                    val order="afh";val i=order.indexOf(tabKey())
+                    val can=(dx<0&&i<2)||(dx>0&&i>0)
+                    lv.translationX=if(can)dx*0.5f else dx*0.15f
+                    return true
+                }
+            }
+            MotionEvent.ACTION_UP,MotionEvent.ACTION_CANCEL->{
+                val was=swOn;swOn=false;swTrack=false
+                if(was){
+                    val dx=ev.rawX-swX;val order="afh";val i=order.indexOf(tabKey())
+                    val j=if(dx<0)i+1 else i-1
+                    if(ev.actionMasked==MotionEvent.ACTION_UP&&Math.abs(dx)>dp(70)&&j in 0..2){lv.translationX=0f;goTab(order[j].toString())}
+                    else lv.animate().translationX(0f).setDuration(160).start()
+                    return true
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
     private fun mode(f:Boolean){
         val same=!showingHistory&&onlyFavorites==f
