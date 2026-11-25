@@ -127,8 +127,16 @@ class MainActivity : Activity() {
     private fun LinearLayout.addFull(v:View,h:Int=ViewGroup.LayoutParams.WRAP_CONTENT,space:Int=0) {
         addView(v,LinearLayout.LayoutParams(-1,if(h<0)h else dp(h)).apply {bottomMargin=dp(space)})
     }
+    // "Ok Google, poné Del Sol en Radio Rocky 35" desde el celular: pasa el pedido al servicio.
+    private fun voice(i:Intent?){
+        if(i?.action!="android.media.action.MEDIA_PLAY_FROM_SEARCH")return
+        val q=i.getStringExtra(android.app.SearchManager.QUERY)?:"";i.action=null
+        try{startService(Intent(this,RadioService::class.java).setAction("voice").putExtra("q",q))}catch(_:Exception){}
+    }
+    override fun onNewIntent(i:Intent){super.onNewIntent(i);setIntent(i);voice(i)}
     override fun onCreate(state:Bundle?) {
         super.onCreate(state)
+        window.decorView.post{voice(intent)}
         audio=getSystemService(Context.AUDIO_SERVICE) as AudioManager
         volumeControlStream=AudioManager.STREAM_MUSIC
         try { val a=JSONArray(prefs.getString("favorites","[]")?: "[]");for(i in 0 until a.length())favorites.add(a.getString(i)) }catch(_:Exception){}

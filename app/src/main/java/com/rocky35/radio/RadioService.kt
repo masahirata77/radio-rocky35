@@ -170,6 +170,7 @@ class RadioService : android.service.media.MediaBrowserService() {
             STOP->stopPlayback("stopped","Detenida")
             RESUME->resume()
             NEXT->skip(1)
+            "voice"->{val sid=findStation(intent.getStringExtra("q")?:"");if(sid!=null){ensureForeground();begin(sid)} else if(id.isNotEmpty())resume() else stopSelf()}
             PREV->skip(-1)
             COPY->{copyText()?.let{copyToClipboard(this,it)};if(!foreground)stopSelf()}
             else->stopSelf()
