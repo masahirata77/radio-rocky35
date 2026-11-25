@@ -346,7 +346,11 @@ class RadioService : android.service.media.MediaBrowserService() {
     private fun allIds()=(0 until Catalog.size).map{Catalog.id(it)}
     private fun favIds():List<String>{val out=ArrayList<String>();try{val a=org.json.JSONArray(prefs().getString("favorites","[]")?:"[]");for(i in 0 until a.length())out.add(a.getString(i))}catch(_:Exception){};return out}
     private fun skip(d:Int){
-        val q=(prefs().getString("queue","")?:"").split(',').filter{it.isNotEmpty()&&Catalog.station(it).isNotEmpty()}.ifEmpty{allIds()}
+        // Por defecto ⏮⏭ recorren las favoritas (en el orden de la última lista vista); sin favoritas, la lista vista.
+        val seen=(prefs().getString("queue","")?:"").split(',').filter{it.isNotEmpty()&&Catalog.station(it).isNotEmpty()}
+        val fav=favIds().filter{Catalog.station(it).isNotEmpty()}
+        val favSeen=seen.filter{it in fav}
+        val q=(if(fav.isNotEmpty())(favSeen+fav.filter{it !in favSeen}) else seen).ifEmpty{allIds()}
         val i=q.indexOf(id);val next=q[if(i<0)0 else Math.floorMod(i+d,q.size)]
         ensureForeground();begin(next)
     }
