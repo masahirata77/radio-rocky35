@@ -152,6 +152,11 @@ class RadioService : android.service.media.MediaBrowserService() {
                 setQueue(this@RadioService,if(m.startsWith("fav:"))favIds() else allIds())
                 startService(Intent(this@RadioService,RadioService::class.java));begin(sid)
             }
+            override fun onPlayFromSearch(query:String?,extras:Bundle?){
+                val sid=findStation(query?:"")
+                if(sid==null){if(id.isNotEmpty())resume();return}
+                startService(Intent(this@RadioService,RadioService::class.java));ensureForeground();begin(sid)
+            }
             override fun onCustomAction(action:String,extras:Bundle?){when(action){STOP->stopPlayback("stopped","Detenida");COPY->copyText()?.let{copyToClipboard(this@RadioService,it)};SEARCH->searchPrompt()}}
         })
         session.setSessionActivity(openApp());session.isActive=true
@@ -292,7 +297,7 @@ class RadioService : android.service.media.MediaBrowserService() {
         updateMetadata()
         phase=p;message=text;logHistory();emit(Snapshot(id,name,p,text,if(p=="playing")song.ifEmpty{program} else ""))
         val playback=when(p){"playing"->PlaybackState.STATE_PLAYING;"loading"->PlaybackState.STATE_BUFFERING;"error"->PlaybackState.STATE_ERROR;else->PlaybackState.STATE_PAUSED}
-        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP or PlaybackState.ACTION_SKIP_TO_NEXT or PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
+        session.setPlaybackState(PlaybackState.Builder().setActions(PlaybackState.ACTION_PLAY or PlaybackState.ACTION_PAUSE or PlaybackState.ACTION_PLAY_PAUSE or PlaybackState.ACTION_STOP or PlaybackState.ACTION_SKIP_TO_NEXT or PlaybackState.ACTION_SKIP_TO_PREVIOUS or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID or PlaybackState.ACTION_PLAY_FROM_SEARCH).setState(playback,PlaybackState.PLAYBACK_POSITION_UNKNOWN,if(playback==PlaybackState.STATE_PLAYING)1f else 0f)
             .apply{
                 if(p!="stopped"&&p!="error"&&copyText()!=null)addCustomAction(PlaybackState.CustomAction.Builder(COPY,"Copiar",R.drawable.ic_copy).build())
                 if(p!="stopped"&&p!="error"&&searchIntent()!=null)addCustomAction(PlaybackState.CustomAction.Builder(SEARCH,"Buscar",R.drawable.ic_search).build())
@@ -345,6 +350,22 @@ class RadioService : android.service.media.MediaBrowserService() {
     private fun prefs()=getSharedPreferences("radio",MODE_PRIVATE)
     private fun allIds()=(0 until Catalog.size).map{Catalog.id(it)}
     private fun favIds():List<String>{val out=ArrayList<String>();try{val a=org.json.JSONArray(prefs().getString("favorites","[]")?:"[]");for(i in 0 until a.length())out.add(a.getString(i))}catch(_:Exception){};return out}
+    // Búsqueda por voz ("poné Del Sol en Radio Rocky 35"): compara sin tildes ni palabras de relleno; prefiere favoritas.
+    private fun norm(t:String)=java.text.Normalizer.normalize(t.lowercase(),java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"),"")
+        .replace(Regex("[^a-z0-9 ]")," ").split(' ').filter{it.isNotEmpty()&&it !in setOf("radio","fm","am","la","el","de","del","en","rocky","35","pone","poner","escuchar","reproducir","emisora")}
+    private fun findStation(q:String):String?{
+        val w=norm(q);if(w.isEmpty())return null
+        val fav=favIds().toSet();var best:String?=null;var bestScore=0.0
+        for(i in 0 until Catalog.size){
+            val nw=norm(Catalog.name(i));if(nw.isEmpty())continue
+            var hit=0;for(x in w)if(nw.any{it==x||(x.length>=4&&(it.startsWith(x)||x.startsWith(it)))})hit++
+            if(hit==0)continue
+            var sc=hit.toDouble()/w.size+hit.toDouble()/nw.size*0.5
+            if(nw==w)sc+=2;val cid=Catalog.id(i);if(cid in fav)sc+=0.3
+            if(sc>bestScore){bestScore=sc;best=cid}
+        }
+        return best
+    }
     private fun skip(d:Int){
         // Por defecto ⏮⏭ recorren las favoritas (en el orden de la última lista vista); sin favoritas, la lista vista.
         val seen=(prefs().getString("queue","")?:"").split(',').filter{it.isNotEmpty()&&Catalog.station(it).isNotEmpty()}
